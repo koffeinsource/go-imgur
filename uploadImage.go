@@ -77,12 +77,20 @@ func (client *Client) UploadImage(image []byte, album string, dtype string, titl
 
 	dec := json.NewDecoder(bytes.NewReader(body))
 	var img imageInfoDataWrapper
-	if err := dec.Decode(&img); err != nil {
+	if err = dec.Decode(&img); err != nil {
 		return nil, -1, errors.New("Problem decoding json result from image upload - " + err.Error())
 	}
 
 	if !img.Success {
 		return nil, img.Status, errors.New("Upload to imgur failed with status: " + strconv.Itoa(img.Status))
 	}
+
+	rl, err := extractRateLimits(res.Header)
+	if err != nil {
+		client.Log.Infof("Problem with extracting reate limits: %v", err)
+	} else {
+		img.Ii.Limit = rl
+	}
+
 	return img.Ii, img.Status, nil
 }

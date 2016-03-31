@@ -55,12 +55,14 @@ type AlbumInfo struct {
 	ImagesCount int `json:"image_count"`
 	// An array of all the images in the album (only available when requesting the direct album)
 	Images []ImageInfo `json:"images"`
+	// Current rate limit
+	Limit *RateLimit
 }
 
 // GetAlbumInfo queries imgur for information on a album
 // returns album info, status code of the request, error
 func (client *Client) GetAlbumInfo(id string) (*AlbumInfo, int, error) {
-	body, err := client.getURL("album/" + id)
+	body, rl, err := client.getURL("album/" + id)
 	if err != nil {
 		return nil, -1, errors.New("Problem getting URL for album info ID " + id + " - " + err.Error())
 	}
@@ -71,6 +73,7 @@ func (client *Client) GetAlbumInfo(id string) (*AlbumInfo, int, error) {
 	if err := dec.Decode(&alb); err != nil {
 		return nil, -1, errors.New("Problem decoding json for albumID " + id + " - " + err.Error())
 	}
+	alb.Ai.Limit = rl
 
 	if !alb.Success {
 		return nil, alb.Status, errors.New("Request to imgur failed for albumID " + id + " - " + strconv.Itoa(alb.Status))

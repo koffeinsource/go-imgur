@@ -12,6 +12,7 @@ type GenericInfo struct {
 	Album  *AlbumInfo
 	GImage *GalleryImageInfo
 	GAlbum *GalleryAlbumInfo
+	Limit  *RateLimit
 }
 
 // GetInfoFromURL tries to query imgur based on information identified in the URL.

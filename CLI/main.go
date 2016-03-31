@@ -17,10 +17,11 @@ func main() {
 	album := flag.String("album", "", "The album ID to be queried.")
 	gimage := flag.String("gimage", "", "The gallery image ID to be queried.")
 	galbum := flag.String("galbum", "", "The gallery album ID to be queried.")
+	rate := flag.Bool("rate", false, "Get the current rate limit.")
 	flag.Parse()
 
 	// Check if there is anything todo
-	if *imgurClientID == "" || (*image == "" && *album == "" && *gimage == "" && *galbum == "" && *upload == "" && *url == "") {
+	if *imgurClientID == "" || (*image == "" && *album == "" && *gimage == "" && *galbum == "" && *upload == "" && *url == "" && *rate == false) {
 		flag.PrintDefaults()
 		return
 	}
@@ -57,6 +58,16 @@ func main() {
 			return
 		}
 		client.Log.Infof("%v\n", img)
+	}
+
+	if *rate {
+		client.Log.Infof("*** RATE LIMIT ***\n")
+		rl, err := client.GetRateLimit()
+		if err != nil {
+			client.Log.Errorf("Error in GetRateLimit: %v\n", err)
+			return
+		}
+		client.Log.Infof("%v\n", *rl)
 	}
 
 	if *image != "" {

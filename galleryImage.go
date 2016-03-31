@@ -79,12 +79,14 @@ type GalleryImageInfo struct {
 	Score int `json:"score"`
 	// if it's an album or not
 	IsAlbum bool `json:"is_album"`
+	// Current rate limit
+	Limit *RateLimit
 }
 
 // GetGalleryImageInfo queries imgur for information on a image
 // returns image info, status code of the request, error
 func (client *Client) GetGalleryImageInfo(id string) (*GalleryImageInfo, int, error) {
-	body, err := client.getURL("gallery/image/" + id)
+	body, rl, err := client.getURL("gallery/image/" + id)
 	if err != nil {
 		return nil, -1, errors.New("Problem getting URL for gallery image info ID " + id + " - " + err.Error())
 	}
@@ -95,6 +97,7 @@ func (client *Client) GetGalleryImageInfo(id string) (*GalleryImageInfo, int, er
 	if err := dec.Decode(&img); err != nil {
 		return nil, -1, errors.New("Problem decoding json for gallery imageID " + id + " - " + err.Error())
 	}
+	img.Ii.Limit = rl
 
 	if !img.Success {
 		return nil, img.Status, errors.New("Request to imgur failed for gallery imageID " + id + " - " + strconv.Itoa(img.Status))

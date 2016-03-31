@@ -59,12 +59,14 @@ type ImageInfo struct {
 	Nsfw bool `json:"nsfw"`
 	// The current user's vote on the album. null if not signed in, if the user hasn't voted on it, or if not submitted to the gallery.
 	Vote string `json:"vote"`
+	// Current rate limit
+	Limit *RateLimit
 }
 
 // GetImageInfo queries imgur for information on a image
 // returns image info, status code of the request, error
 func (client *Client) GetImageInfo(id string) (*ImageInfo, int, error) {
-	body, err := client.getURL("image/" + id)
+	body, rl, err := client.getURL("image/" + id)
 	if err != nil {
 		return nil, -1, errors.New("Problem getting URL for image info ID " + id + " - " + err.Error())
 	}
@@ -75,6 +77,7 @@ func (client *Client) GetImageInfo(id string) (*ImageInfo, int, error) {
 	if err := dec.Decode(&img); err != nil {
 		return nil, -1, errors.New("Problem decoding json for imageID " + id + " - " + err.Error())
 	}
+	img.Ii.Limit = rl
 
 	if !img.Success {
 		return nil, img.Status, errors.New("Request to imgur failed for imageID " + id + " - " + strconv.Itoa(img.Status))
