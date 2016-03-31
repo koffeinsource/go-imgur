@@ -90,7 +90,7 @@ func (client *Client) GetGalleryImageInfo(id string) (*GalleryImageInfo, int, er
 	if err != nil {
 		return nil, -1, errors.New("Problem getting URL for gallery image info ID " + id + " - " + err.Error())
 	}
-	client.Log.Debugf("%v\n", body)
+	// client.Log.Debugf("%v\n", body)
 
 	dec := json.NewDecoder(strings.NewReader(body))
 	var img galleryImageInfoDataWrapper

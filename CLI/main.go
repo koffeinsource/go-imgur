@@ -9,6 +9,95 @@ import (
 	"github.com/koffeinsource/go-klogger"
 )
 
+func uploadFile(client *imgur.Client, upload *string) {
+	client.Log.Infof("*** IMAGE UPLOAD ***\n")
+	f, err := os.Open(*upload)
+	if err != nil {
+		client.Log.Errorf("Could not open file %v - Error: %v", *upload, err)
+		return
+	}
+	defer f.Close()
+	fileinfo, err := f.Stat()
+	if err != nil {
+		client.Log.Errorf("Could not stat file %v - Error: %v", *upload, err)
+		return
+	}
+	size := fileinfo.Size()
+	b := make([]byte, size)
+	n, err := f.Read(b)
+	if err != nil || int64(n) != size {
+		client.Log.Errorf("Could not read file %v - Error: %v", *upload, err)
+		return
+	}
+
+	img, _, err := client.UploadImage(b, "", "binary", "test upload", "test desc")
+	if err != nil {
+		client.Log.Errorf("Error in UploadImage: %v\n", err)
+		return
+	}
+	client.Log.Infof("%v\n", img)
+}
+
+func printRate(client *imgur.Client) {
+	client.Log.Infof("*** RATE LIMIT ***\n")
+	rl, err := client.GetRateLimit()
+	if err != nil {
+		client.Log.Errorf("Error in GetRateLimit: %v\n", err)
+		return
+	}
+	client.Log.Infof("%v\n", *rl)
+}
+
+func printImage(client *imgur.Client, image *string) {
+	client.Log.Infof("*** IMAGE ***\n")
+	img, _, err := client.GetImageInfo(*image)
+	if err != nil {
+		client.Log.Errorf("Error in GetImageInfo: %v\n", err)
+		return
+	}
+	client.Log.Infof("%v\n", img)
+}
+
+func printAlbum(client *imgur.Client, album *string) {
+	client.Log.Infof("*** ALBUM ***\n")
+	img, _, err := client.GetAlbumInfo(*album)
+	if err != nil {
+		client.Log.Errorf("Error in GetAlbumInfo: %v\n", err)
+		return
+	}
+	client.Log.Infof("%v\n", img)
+}
+
+func printGImage(client *imgur.Client, gimage *string) {
+	client.Log.Infof("*** GALLERY IMAGE ***\n")
+	img, _, err := client.GetGalleryImageInfo(*gimage)
+	if err != nil {
+		client.Log.Errorf("Error in GetGalleryImageInfo: %v\n", err)
+		return
+	}
+	client.Log.Infof("%v\n", img)
+}
+
+func printGAlbum(client *imgur.Client, galbum *string) {
+	client.Log.Infof("*** GALLERY ALBUM ***\n")
+	img, _, err := client.GetGalleryAlbumInfo(*galbum)
+	if err != nil {
+		client.Log.Errorf("Error in GetGalleryAlbumInfo: %v\n", err)
+		return
+	}
+	client.Log.Infof("%v\n", img)
+}
+
+func printURL(client *imgur.Client, url *string) {
+	client.Log.Infof("*** URL ***\n")
+	img, _, err := client.GetInfoFromURL(*url)
+	if err != nil {
+		client.Log.Errorf("Error in GetInfoFromURL: %v\n", err)
+		return
+	}
+	client.Log.Infof("%v\n", img)
+}
+
 func main() {
 	imgurClientID := flag.String("id", "", "Your imgur client id. REQUIRED!")
 	url := flag.String("url", "", "Gets information based on the URL passed.")
@@ -32,91 +121,30 @@ func main() {
 	client.ImgurClientID = *imgurClientID
 
 	if *upload != "" {
-		client.Log.Infof("*** IMAGE UPLOAD ***\n")
-		f, err := os.Open(*upload)
-		if err != nil {
-			client.Log.Errorf("Could not open file %v - Error: %v", *upload, err)
-			return
-		}
-		defer f.Close()
-		fileinfo, err := f.Stat()
-		if err != nil {
-			client.Log.Errorf("Could not stat file %v - Error: %v", *upload, err)
-			return
-		}
-		size := fileinfo.Size()
-		b := make([]byte, size)
-		n, err := f.Read(b)
-		if err != nil || int64(n) != size {
-			client.Log.Errorf("Could not read file %v - Error: %v", *upload, err)
-			return
-		}
-
-		img, _, err := client.UploadImage(b, "", "binary", "test upload", "test desc")
-		if err != nil {
-			client.Log.Errorf("Error in UploadImage: %v\n", err)
-			return
-		}
-		client.Log.Infof("%v\n", img)
+		uploadFile(client, upload)
 	}
 
 	if *rate {
-		client.Log.Infof("*** RATE LIMIT ***\n")
-		rl, err := client.GetRateLimit()
-		if err != nil {
-			client.Log.Errorf("Error in GetRateLimit: %v\n", err)
-			return
-		}
-		client.Log.Infof("%v\n", *rl)
+		printRate(client)
 	}
 
 	if *image != "" {
-		client.Log.Infof("*** IMAGE ***\n")
-		img, _, err := client.GetImageInfo(*image)
-		if err != nil {
-			client.Log.Errorf("Error in GetImageInfo: %v\n", err)
-			return
-		}
-		client.Log.Infof("%v\n", img)
+		printImage(client, image)
 	}
 
 	if *album != "" {
-		client.Log.Infof("*** ALBUM ***\n")
-		img, _, err := client.GetAlbumInfo(*album)
-		if err != nil {
-			client.Log.Errorf("Error in GetAlbumInfo: %v\n", err)
-			return
-		}
-		client.Log.Infof("%v\n", img)
+		printAlbum(client, album)
 	}
 
 	if *gimage != "" {
-		client.Log.Infof("*** GALLERY IMAGE ***\n")
-		img, _, err := client.GetGalleryImageInfo(*gimage)
-		if err != nil {
-			client.Log.Errorf("Error in GetGalleryImageInfo: %v\n", err)
-			return
-		}
-		client.Log.Infof("%v\n", img)
+		printGImage(client, gimage)
 	}
 
 	if *galbum != "" {
-		client.Log.Infof("*** GALLERY ALBUM ***\n")
-		img, _, err := client.GetGalleryAlbumInfo(*galbum)
-		if err != nil {
-			client.Log.Errorf("Error in GetGalleryAlbumInfo: %v\n", err)
-			return
-		}
-		client.Log.Infof("%v\n", img)
+		printGAlbum(client, galbum)
 	}
 
 	if *url != "" {
-		client.Log.Infof("*** URL ***\n")
-		img, _, err := client.GetInfoFromURL(*url)
-		if err != nil {
-			client.Log.Errorf("Error in GetInfoFromURL: %v\n", err)
-			return
-		}
-		client.Log.Infof("%v\n", img)
+		printURL(client, url)
 	}
 }

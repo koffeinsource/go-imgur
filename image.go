@@ -70,7 +70,7 @@ func (client *Client) GetImageInfo(id string) (*ImageInfo, int, error) {
 	if err != nil {
 		return nil, -1, errors.New("Problem getting URL for image info ID " + id + " - " + err.Error())
 	}
-	client.Log.Debugf("%v\n", body)
+	// client.Log.Debugf("%v\n", body)
 
 	dec := json.NewDecoder(strings.NewReader(body))
 	var img imageInfoDataWrapper

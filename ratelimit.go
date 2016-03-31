@@ -74,7 +74,7 @@ func (client *Client) GetRateLimit() (*RateLimit, error) {
 	if err != nil {
 		return nil, errors.New("Problem getting URL for rate - " + err.Error())
 	}
-	client.Log.Debugf("%v\n", body)
+	// client.Log.Debugf("%v\n", body)
 
 	dec := json.NewDecoder(strings.NewReader(body))
 	var rl rateLimitDataWrapper

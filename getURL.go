@@ -36,7 +36,7 @@ func (client *Client) getURL(URL string) (string, *RateLimit, error) {
 	// Get RateLimit headers
 	rl, err := extractRateLimits(res.Header)
 	if err != nil {
-		client.Log.Infof("Problem with extracting reate limits: %v", err)
+		client.Log.Infof("Problem with extracting rate limits: %v", err)
 	}
 
 	return string(body[:]), rl, nil

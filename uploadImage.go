@@ -2,7 +2,6 @@ package imgur
 
 import (
 	"bytes"
-	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"io/ioutil"
@@ -11,25 +10,12 @@ import (
 	"strconv"
 )
 
-// UploadImage uploads the image to imgur
-// image                Can be a binary file, base64 data, or a URL for an image. (up to 10MB)
-// album       optional The id of the album you want to add the image to.
-//                      For anonymous albums, album should be the deletehash that is returned at creation.
-// dtype                The type of the file that's being sent; file, base64 or URL
-// title       optional The title of the image.
-// description optional The description of the image.
-// returns image info, status code of the upload, error
-func (client *Client) UploadImage(image []byte, album string, dtype string, title string, description string) (*ImageInfo, int, error) {
-	if dtype != "binary" && dtype != "base64" && dtype != "URL" {
-		return nil, -1, errors.New("Passed invalid dtype: " + dtype + ". Please use binary/base64/URL.")
-	}
-
+func createUploadForm(image []byte, album string, dtype string, title string, description string) url.Values {
 	form := url.Values{}
 
 	if dtype == "binary" {
-		// TODO test binary
-		form.Add("image", base64.StdEncoding.EncodeToString(image))
-		form.Add("type", "base64")
+		form.Add("image", string(image[:]))
+		form.Add("type", "file")
 	}
 	if dtype == "base64" {
 		form.Add("image", string(image[:]))
@@ -49,7 +35,24 @@ func (client *Client) UploadImage(image []byte, album string, dtype string, titl
 	if description != "" {
 		form.Add("description", description)
 	}
-	client.Log.Infof("Form %v\n", form)
+
+	return form
+}
+
+// UploadImage uploads the image to imgur
+// image                Can be a binary file, base64 data, or a URL for an image. (up to 10MB)
+// album       optional The id of the album you want to add the image to.
+//                      For anonymous albums, album should be the deletehash that is returned at creation.
+// dtype                The type of the file that's being sent; file, base64 or URL
+// title       optional The title of the image.
+// description optional The description of the image.
+// returns image info, status code of the upload, error
+func (client *Client) UploadImage(image []byte, album string, dtype string, title string, description string) (*ImageInfo, int, error) {
+	if dtype != "binary" && dtype != "base64" && dtype != "URL" {
+		return nil, -1, errors.New("Passed invalid dtype: " + dtype + ". Please use binary/base64/URL.")
+	}
+
+	form := createUploadForm(image, album, dtype, title, description)
 
 	URL := apiEndpoint + "image"
 	req, err := http.NewRequest("POST", URL, bytes.NewBufferString(form.Encode()))
@@ -73,7 +76,7 @@ func (client *Client) UploadImage(image []byte, album string, dtype string, titl
 		return nil, -1, errors.New("Problem reading the body for " + URL + " - " + err.Error())
 	}
 
-	client.Log.Debugf("%v\n", string(body[:]))
+	// client.Log.Debugf("%v\n", string(body[:]))
 
 	dec := json.NewDecoder(bytes.NewReader(body))
 	var img imageInfoDataWrapper
@@ -87,7 +90,7 @@ func (client *Client) UploadImage(image []byte, album string, dtype string, titl
 
 	rl, err := extractRateLimits(res.Header)
 	if err != nil {
-		client.Log.Infof("Problem with extracting reate limits: %v", err)
+		client.Log.Infof("Problem with extracting rate limits: %v", err)
 	} else {
 		img.Ii.Limit = rl
 	}
