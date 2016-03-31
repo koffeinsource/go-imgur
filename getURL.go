@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func getURL(URL string, client *Client) (string, error) {
+func (client *Client) getURL(URL string) (string, error) {
 	URL = apiEndpoint + URL
 	client.Log.Infof("Requesting URL %v\n", URL)
 	req, err := http.NewRequest("GET", URL, nil)

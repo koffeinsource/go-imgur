@@ -16,7 +16,7 @@ type GenericInfo struct {
 
 // GetInfoFromURL tries to query imgur based on information identified in the URL.
 // returns image/album info, status code of the request, error
-func GetInfoFromURL(client *Client, url string) (*GenericInfo, int, error) {
+func (client *Client) GetInfoFromURL(url string) (*GenericInfo, int, error) {
 	url = strings.TrimSpace(url)
 	var ret GenericInfo
 
@@ -29,8 +29,8 @@ func GetInfoFromURL(client *Client, url string) (*GenericInfo, int, error) {
 		}
 		id := url[start:end]
 		client.Log.Debugf("Detected imgur image ID %v. Was going down the i.imgur.com/ path.", id)
-		ii, status, err := GetImageInfo(client, id)
-		ret.Image = ii
+		ii, status, err := client.GetGalleryImageInfo(id)
+		ret.GImage = ii
 		return &ret, status, err
 	}
 
@@ -42,7 +42,7 @@ func GetInfoFromURL(client *Client, url string) (*GenericInfo, int, error) {
 		}
 		id := url[start:]
 		client.Log.Debugf("Detected imgur album ID %v. Was going down the imgur.com/a/ path.", id)
-		ai, status, err := GetAlbumInfo(client, id)
+		ai, status, err := client.GetAlbumInfo(id)
 		ret.Album = ai
 		return &ret, status, err
 	}
@@ -58,12 +58,12 @@ func GetInfoFromURL(client *Client, url string) (*GenericInfo, int, error) {
 		client.Log.Debugf("Detected imgur gallery ID %v. Was going down the imgur.com/gallery/ path.", id)
 		if len(id) == 5 {
 			client.Log.Debugf("Detected imgur gallery album.")
-			ai, status, err := GetGalleryAlbumInfo(client, id)
+			ai, status, err := client.GetGalleryAlbumInfo(id)
 			ret.GAlbum = ai
 			return &ret, status, err
 		}
 
-		ii, status, err := GetGalleryImageInfo(client, id)
+		ii, status, err := client.GetGalleryImageInfo(id)
 		ret.GImage = ii
 		return &ret, status, err
 	}
@@ -76,8 +76,8 @@ func GetInfoFromURL(client *Client, url string) (*GenericInfo, int, error) {
 		}
 		id := url[start:]
 		client.Log.Debugf("Detected imgur image ID %v. Was going down the imgur.com/ path.", id)
-		ii, status, err := GetImageInfo(client, id)
-		ret.Image = ii
+		ii, status, err := client.GetGalleryImageInfo(id)
+		ret.GImage = ii
 		return &ret, status, err
 	}
 

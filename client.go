@@ -6,7 +6,7 @@ import (
 	"github.com/koffeinsource/go-klogger"
 )
 
-// Client used to configure go-imgur
+// Client used to for go-imgur
 type Client struct {
 	HTTPClient    *http.Client
 	Log           klogger.KLogger

@@ -83,8 +83,8 @@ type GalleryImageInfo struct {
 
 // GetGalleryImageInfo queries imgur for information on a image
 // returns image info, status code of the request, error
-func GetGalleryImageInfo(client *Client, id string) (*GalleryImageInfo, int, error) {
-	body, err := getURL("gallery/image/"+id, client)
+func (client *Client) GetGalleryImageInfo(id string) (*GalleryImageInfo, int, error) {
+	body, err := client.getURL("gallery/image/" + id)
 	if err != nil {
 		return nil, -1, errors.New("Problem getting URL for gallery image info ID " + id + " - " + err.Error())
 	}

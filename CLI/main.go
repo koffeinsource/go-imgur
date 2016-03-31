@@ -51,7 +51,7 @@ func main() {
 			return
 		}
 
-		img, _, err := imgur.UploadImage(client, b, "", "binary", "test upload", "test desc")
+		img, _, err := client.UploadImage(b, "", "binary", "test upload", "test desc")
 		if err != nil {
 			client.Log.Errorf("Error in UploadImage: %v\n", err)
 			return
@@ -61,7 +61,7 @@ func main() {
 
 	if *image != "" {
 		client.Log.Infof("*** IMAGE ***\n")
-		img, _, err := imgur.GetImageInfo(client, *image)
+		img, _, err := client.GetImageInfo(*image)
 		if err != nil {
 			client.Log.Errorf("Error in GetImageInfo: %v\n", err)
 			return
@@ -71,7 +71,7 @@ func main() {
 
 	if *album != "" {
 		client.Log.Infof("*** ALBUM ***\n")
-		img, _, err := imgur.GetAlbumInfo(client, *album)
+		img, _, err := client.GetAlbumInfo(*album)
 		if err != nil {
 			client.Log.Errorf("Error in GetAlbumInfo: %v\n", err)
 			return
@@ -81,7 +81,7 @@ func main() {
 
 	if *gimage != "" {
 		client.Log.Infof("*** GALLERY IMAGE ***\n")
-		img, _, err := imgur.GetGalleryImageInfo(client, *gimage)
+		img, _, err := client.GetGalleryImageInfo(*gimage)
 		if err != nil {
 			client.Log.Errorf("Error in GetGalleryImageInfo: %v\n", err)
 			return
@@ -91,7 +91,7 @@ func main() {
 
 	if *galbum != "" {
 		client.Log.Infof("*** GALLERY ALBUM ***\n")
-		img, _, err := imgur.GetGalleryAlbumInfo(client, *galbum)
+		img, _, err := client.GetGalleryAlbumInfo(*galbum)
 		if err != nil {
 			client.Log.Errorf("Error in GetGalleryAlbumInfo: %v\n", err)
 			return
@@ -101,7 +101,7 @@ func main() {
 
 	if *url != "" {
 		client.Log.Infof("*** URL ***\n")
-		img, _, err := imgur.GetInfoFromURL(client, *url)
+		img, _, err := client.GetInfoFromURL(*url)
 		if err != nil {
 			client.Log.Errorf("Error in GetInfoFromURL: %v\n", err)
 			return

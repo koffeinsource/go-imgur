@@ -59,8 +59,8 @@ type AlbumInfo struct {
 
 // GetAlbumInfo queries imgur for information on a album
 // returns album info, status code of the request, error
-func GetAlbumInfo(client *Client, id string) (*AlbumInfo, int, error) {
-	body, err := getURL("album/"+id, client)
+func (client *Client) GetAlbumInfo(id string) (*AlbumInfo, int, error) {
+	body, err := client.getURL("album/" + id)
 	if err != nil {
 		return nil, -1, errors.New("Problem getting URL for album info ID " + id + " - " + err.Error())
 	}

@@ -19,7 +19,7 @@ import (
 // title       optional The title of the image.
 // description optional The description of the image.
 // returns image info, status code of the upload, error
-func UploadImage(client *Client, image []byte, album string, dtype string, title string, description string) (*ImageInfo, int, error) {
+func (client *Client) UploadImage(image []byte, album string, dtype string, title string, description string) (*ImageInfo, int, error) {
 	if dtype != "binary" && dtype != "base64" && dtype != "URL" {
 		return nil, -1, errors.New("Passed invalid dtype: " + dtype + ". Please use binary/base64/URL.")
 	}
