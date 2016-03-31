@@ -30,8 +30,14 @@ func (client *Client) GetInfoFromURL(url string) (*GenericInfo, int, error) {
 		}
 		id := url[start:end]
 		client.Log.Debugf("Detected imgur image ID %v. Was going down the i.imgur.com/ path.", id)
-		ii, status, err := client.GetGalleryImageInfo(id)
-		ret.GImage = ii
+		gii, status, err := client.GetGalleryImageInfo(id)
+		if status < 400 {
+			ret.GImage = gii
+		} else {
+			var ii *ImageInfo
+			ii, status, err = client.GetImageInfo(id)
+			ret.Image = ii
+		}
 		return &ret, status, err
 	}
 
