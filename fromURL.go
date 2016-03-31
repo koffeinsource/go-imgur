@@ -24,7 +24,7 @@ func (client *Client) GetInfoFromURL(url string) (*GenericInfo, int, error) {
 	// https://i.imgur.com/<id>.jpg -> image
 	if strings.Contains(url, "://i.imgur.com/") {
 		start := strings.LastIndex(url, "/") + 1
-		end := strings.LastIndex(url, ".") - 1
+		end := strings.LastIndex(url, ".")
 		if start == -1 || end == -1 || start == end {
 			return nil, -1, errors.New("Could not find ID in URL " + url + ". I was going down i.imgur.com path.")
 		}
