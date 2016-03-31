@@ -66,7 +66,7 @@ type GalleryAlbumInfo struct {
 	// Topic ID of the gallery album.
 	TopicID int `json:"topic_id"`
 	// The total number of images in the album
-	ImagesCount int `json:"image_count"`
+	ImagesCount int `json:"images_count"`
 	// An array of all the images in the album (only available when requesting the direct album)
 	Images []ImageInfo `json:"images,omitempty"`
 	// Current rate limit

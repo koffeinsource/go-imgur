@@ -52,7 +52,7 @@ type AlbumInfo struct {
 	// OPTIONAL, the deletehash, if you're logged in as the album owner
 	Deletehash string `json:"deletehash,omitempty"`
 	// The total number of images in the album
-	ImagesCount int `json:"image_count"`
+	ImagesCount int `json:"images_count"`
 	// An array of all the images in the album (only available when requesting the direct album)
 	Images []ImageInfo `json:"images"`
 	// Current rate limit
