@@ -10,35 +10,6 @@ import (
 	"strconv"
 )
 
-func createUploadForm(image []byte, album string, dtype string, title string, description string) url.Values {
-	form := url.Values{}
-
-	if dtype == "binary" {
-		form.Add("image", string(image[:]))
-		form.Add("type", "file")
-	}
-	if dtype == "base64" {
-		form.Add("image", string(image[:]))
-		form.Add("type", "base64")
-	}
-	if dtype == "URL" {
-		form.Add("image", string(image[:]))
-		form.Add("type", "URL")
-	}
-
-	if album != "" {
-		form.Add("album", album)
-	}
-	if title != "" {
-		form.Add("title", title)
-	}
-	if description != "" {
-		form.Add("description", description)
-	}
-
-	return form
-}
-
 // UploadImage uploads the image to imgur
 // image                Can be a binary file, base64 data, or a URL for an image. (up to 10MB)
 // album       optional The id of the album you want to add the image to.
@@ -96,4 +67,33 @@ func (client *Client) UploadImage(image []byte, album string, dtype string, titl
 	}
 
 	return img.Ii, img.Status, nil
+}
+
+func createUploadForm(image []byte, album string, dtype string, title string, description string) url.Values {
+	form := url.Values{}
+
+	if dtype == "binary" {
+		form.Add("image", string(image[:]))
+		form.Add("type", "file")
+	}
+	if dtype == "base64" {
+		form.Add("image", string(image[:]))
+		form.Add("type", "base64")
+	}
+	if dtype == "URL" {
+		form.Add("image", string(image[:]))
+		form.Add("type", "URL")
+	}
+
+	if album != "" {
+		form.Add("album", album)
+	}
+	if title != "" {
+		form.Add("title", title)
+	}
+	if description != "" {
+		form.Add("description", description)
+	}
+
+	return form
 }
