@@ -42,12 +42,13 @@ func (client *Client) GetInfoFromURL(url string) (*GenericInfo, int, error) {
 	}
 
 	// https://imgur.com/a/<id> -> album
-	if strings.Contains(url, "://imgur.com/a/") {
+	if strings.Contains(url, "://imgur.com/a/") || strings.Contains(url, "://m.imgur.com/a/") {
 		start := strings.LastIndex(url, "/") + 1
 		if start == -1 {
 			return nil, -1, errors.New("Could not find ID in URL " + url + ". I was going down imgur.com/a/ path.")
 		}
-		id := url[start:]
+		end := strings.LastIndex(url, "?")
+		id := url[start:end]
 		client.Log.Debugf("Detected imgur album ID %v. Was going down the imgur.com/a/ path.", id)
 		ai, status, err := client.GetAlbumInfo(id)
 		ret.Album = ai
@@ -56,12 +57,13 @@ func (client *Client) GetInfoFromURL(url string) (*GenericInfo, int, error) {
 
 	// https://imgur.com/gallery/<id> len(id) == 5 -> gallery album
 	// https://imgur.com/gallery/<id> len(id) == 7 -> gallery image
-	if strings.Contains(url, "://imgur.com/gallery/") {
+	if strings.Contains(url, "://imgur.com/gallery/") || strings.Contains(url, "://m.imgur.com/gallery/") {
 		start := strings.LastIndex(url, "/") + 1
 		if start == -1 {
 			return nil, -1, errors.New("Could not find ID in URL " + url + ". I was going down imgur.com/gallery/ path.")
 		}
-		id := url[start:]
+		end := strings.LastIndex(url, "?")
+		id := url[start:end]
 		client.Log.Debugf("Detected imgur gallery ID %v. Was going down the imgur.com/gallery/ path.", id)
 		if len(id) == 5 {
 			client.Log.Debugf("Detected imgur gallery album.")
@@ -76,12 +78,13 @@ func (client *Client) GetInfoFromURL(url string) (*GenericInfo, int, error) {
 	}
 
 	// https://imgur.com/<id> -> image
-	if strings.Contains(url, "://imgur.com/") {
+	if strings.Contains(url, "://imgur.com/") || strings.Contains(url, "://m.imgur.com/") {
 		start := strings.LastIndex(url, "/") + 1
 		if start == -1 {
 			return nil, -1, errors.New("Could not find ID in URL " + url + ". I was going down imgur.com/ path.")
 		}
-		id := url[start:]
+		end := strings.LastIndex(url, "?")
+		id := url[start:end]
 		client.Log.Debugf("Detected imgur image ID %v. Was going down the imgur.com/ path.", id)
 		ii, status, err := client.GetGalleryImageInfo(id)
 		ret.GImage = ii
