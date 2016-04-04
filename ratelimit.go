@@ -32,31 +32,31 @@ func extractRateLimits(h http.Header) (*RateLimit, error) {
 	var rl RateLimit
 
 	userLimit, err := strconv.Atoi(h.Get("X-RateLimit-UserLimit"))
-	if err != nil {
+	if err != nil && h.Get("X-RateLimit-UserLimit") != "" {
 		return nil, errors.New("Problem parsing X-RateLimit-UserLimit header: " + err.Error())
 	}
 	rl.UserLimit = userLimit
 
 	userRemaining, err := strconv.Atoi(h.Get("X-RateLimit-UserRemaining"))
-	if err != nil {
+	if err != nil && h.Get("X-RateLimit-UserRemaining") != "" {
 		return nil, errors.New("Problem parsing X-RateLimit-UserRemaining header: " + err.Error())
 	}
 	rl.UserRemaining = userRemaining
 
 	userReset, err := strconv.Atoi(h.Get("X-RateLimit-UserReset"))
-	if err != nil {
+	if err != nil && h.Get("X-RateLimit-UserReset") != "" {
 		return nil, errors.New("Problem parsing X-RateLimit-UserReset header: " + err.Error())
 	}
 	rl.UserReset = userReset
 
 	clientLimit, err := strconv.Atoi(h.Get("X-RateLimit-ClientLimit"))
-	if err != nil {
+	if err != nil && h.Get("X-RateLimit-ClientLimit") != "" {
 		return nil, errors.New("Problem parsing X-RateLimit-ClientLimit header: " + err.Error())
 	}
 	rl.ClientLimit = clientLimit
 
 	clientRemaining, err := strconv.Atoi(h.Get("X-RateLimit-ClientRemaining"))
-	if err != nil {
+	if err != nil && h.Get("X-RateLimit-ClientRemaining") != "" {
 		return nil, errors.New("Problem parsing X-RateLimit-ClientRemaining header: " + err.Error())
 	}
 	rl.ClientRemaining = clientRemaining

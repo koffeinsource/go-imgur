@@ -84,6 +84,9 @@ func (client *Client) GetInfoFromURL(url string) (*GenericInfo, int, error) {
 			return nil, -1, errors.New("Could not find ID in URL " + url + ". I was going down imgur.com/ path.")
 		}
 		end := strings.LastIndex(url, "?")
+		if end == -1 {
+			end = len(url)
+		}
 		id := url[start:end]
 		client.Log.Debugf("Detected imgur image ID %v. Was going down the imgur.com/ path.", id)
 		ii, status, err := client.GetGalleryImageInfo(id)
