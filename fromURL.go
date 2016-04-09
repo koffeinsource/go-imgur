@@ -48,6 +48,9 @@ func (client *Client) GetInfoFromURL(url string) (*GenericInfo, int, error) {
 			return nil, -1, errors.New("Could not find ID in URL " + url + ". I was going down imgur.com/a/ path.")
 		}
 		end := strings.LastIndex(url, "?")
+		if end == -1 {
+			end = len(url)
+		}
 		id := url[start:end]
 		client.Log.Debugf("Detected imgur album ID %v. Was going down the imgur.com/a/ path.", id)
 		ai, status, err := client.GetAlbumInfo(id)
@@ -63,6 +66,9 @@ func (client *Client) GetInfoFromURL(url string) (*GenericInfo, int, error) {
 			return nil, -1, errors.New("Could not find ID in URL " + url + ". I was going down imgur.com/gallery/ path.")
 		}
 		end := strings.LastIndex(url, "?")
+		if end == -1 {
+			end = len(url)
+		}
 		id := url[start:end]
 		client.Log.Debugf("Detected imgur gallery ID %v. Was going down the imgur.com/gallery/ path.", id)
 		if len(id) == 5 {
