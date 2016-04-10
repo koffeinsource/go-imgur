@@ -6,60 +6,85 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type rateLimitDataWrapper struct {
-	Rl      *RateLimit `json:"data"`
-	Success bool       `json:"success"`
-	Status  int        `json:"status"`
+	Rl      *rateLimitInternal `json:"data"`
+	Success bool               `json:"success"`
+	Status  int                `json:"status"`
+}
+
+// internal representation used for the json parser
+type rateLimitInternal struct {
+	UserLimit       int64
+	UserRemaining   int64
+	UserReset       int64
+	ClientLimit     int64
+	ClientRemaining int64
 }
 
 // RateLimit details can be found here: https://api.imgur.com/#limits
 type RateLimit struct {
 	// Total credits that can be allocated.
-	UserLimit int
+	UserLimit int64
 	// Total credits available.
-	UserRemaining int
-	// Timestamp (unix epoch) for when the credits will be reset.
-	UserReset int
+	UserRemaining int64
+	// Timestamp for when the credits will be reset.
+	UserReset time.Time
 	// Total credits that can be allocated for the application in a day.
-	ClientLimit int
+	ClientLimit int64
 	// Total credits remaining for the application in a day.
-	ClientRemaining int
+	ClientRemaining int64
 }
 
 func extractRateLimits(h http.Header) (*RateLimit, error) {
 	var rl RateLimit
 
-	userLimit, err := strconv.Atoi(h.Get("X-RateLimit-UserLimit"))
-	if err != nil && h.Get("X-RateLimit-UserLimit") != "" {
-		return nil, errors.New("Problem parsing X-RateLimit-UserLimit header: " + err.Error())
+	userLimitStr := h.Get("X-RateLimit-UserLimit")
+	if userLimitStr != "" {
+		userLimit, err := strconv.ParseInt(userLimitStr, 10, 32)
+		if err != nil {
+			return nil, errors.New("Problem parsing X-RateLimit-UserLimit header: " + err.Error())
+		}
+		rl.UserLimit = userLimit
 	}
-	rl.UserLimit = userLimit
 
-	userRemaining, err := strconv.Atoi(h.Get("X-RateLimit-UserRemaining"))
-	if err != nil && h.Get("X-RateLimit-UserRemaining") != "" {
-		return nil, errors.New("Problem parsing X-RateLimit-UserRemaining header: " + err.Error())
+	userRemainingStr := h.Get("X-RateLimit-UserRemaining")
+	if userRemainingStr != "" {
+		userRemaining, err := strconv.ParseInt(userRemainingStr, 10, 32)
+		if err != nil {
+			return nil, errors.New("Problem parsing X-RateLimit-UserRemaining header: " + err.Error())
+		}
+		rl.UserRemaining = userRemaining
 	}
-	rl.UserRemaining = userRemaining
 
-	userReset, err := strconv.Atoi(h.Get("X-RateLimit-UserReset"))
-	if err != nil && h.Get("X-RateLimit-UserReset") != "" {
-		return nil, errors.New("Problem parsing X-RateLimit-UserReset header: " + err.Error())
+	unixTimeStr := h.Get("X-RateLimit-UserReset")
+	if unixTimeStr != "" {
+		userReset, err := strconv.ParseInt(unixTimeStr, 10, 64)
+		if err != nil {
+			return nil, errors.New("Problem parsing X-RateLimit-UserReset header: " + err.Error())
+		}
+		rl.UserReset = time.Unix(userReset, 0)
 	}
-	rl.UserReset = userReset
 
-	clientLimit, err := strconv.Atoi(h.Get("X-RateLimit-ClientLimit"))
-	if err != nil && h.Get("X-RateLimit-ClientLimit") != "" {
-		return nil, errors.New("Problem parsing X-RateLimit-ClientLimit header: " + err.Error())
+	clientLimitStr := h.Get("X-RateLimit-ClientLimit")
+	if clientLimitStr != "" {
+		clientLimit, err := strconv.ParseInt(clientLimitStr, 10, 32)
+		if err != nil && h.Get("X-RateLimit-ClientLimit") != "" {
+			return nil, errors.New("Problem parsing X-RateLimit-ClientLimit header: " + err.Error())
+		}
+		rl.ClientLimit = clientLimit
 	}
-	rl.ClientLimit = clientLimit
 
-	clientRemaining, err := strconv.Atoi(h.Get("X-RateLimit-ClientRemaining"))
-	if err != nil && h.Get("X-RateLimit-ClientRemaining") != "" {
-		return nil, errors.New("Problem parsing X-RateLimit-ClientRemaining header: " + err.Error())
+	clientRemainingStr := h.Get("X-RateLimit-ClientRemaining")
+	if clientRemainingStr != "" {
+		clientRemaining, err := strconv.ParseInt(clientRemainingStr, 10, 32)
+		if err != nil {
+			return nil, errors.New("Problem parsing X-RateLimit-ClientRemaining header: " + err.Error())
+		}
+		rl.ClientRemaining = clientRemaining
 	}
-	rl.ClientRemaining = clientRemaining
 
 	return &rl, nil
 }
@@ -85,6 +110,14 @@ func (client *Client) GetRateLimit() (*RateLimit, error) {
 	if !rl.Success {
 		return nil, errors.New("Request to imgur failed for ratelimit - " + strconv.Itoa(rl.Status))
 	}
-	return rl.Rl, nil
+
+	var ret RateLimit
+	ret.ClientLimit = rl.Rl.ClientLimit
+	ret.ClientRemaining = rl.Rl.ClientRemaining
+	ret.UserLimit = rl.Rl.UserLimit
+	ret.UserRemaining = rl.Rl.UserRemaining
+	ret.UserReset = time.Unix(rl.Rl.UserReset, 0)
+
+	return &ret, nil
 
 }
