@@ -52,6 +52,22 @@ func TestRateLimitReal(t *testing.T) {
 	}
 }
 
+func TestRateLimitImgurNotSuccess(t *testing.T) {
+	httpC, server := testHTTPClientJSON("{\"data\": {}, \"success\": false, \"status\": 200 }")
+	defer server.Close()
+
+	client := new(Client)
+	client.HTTPClient = httpC
+	client.Log = new(klogger.CLILogger)
+	client.ImgurClientID = "testing"
+
+	_, err := client.GetRateLimit()
+
+	if err == nil {
+		t.Error("GetRateLimit() should have failed, but didn't")
+	}
+}
+
 func TestRateLimitJsonError(t *testing.T) {
 	httpC, server := testHTTPClientInvalidJSON()
 	defer server.Close()
