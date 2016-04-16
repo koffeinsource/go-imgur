@@ -20,7 +20,7 @@ func TestImageImgurSimulated(t *testing.T) {
 	img, status, err := client.GetImageInfo("ClF8rLe")
 
 	if err != nil {
-		t.Errorf("GetRateLimit() failed with error: %v", err)
+		t.Errorf("GetImageInfo() failed with error: %v", err)
 		t.FailNow()
 	}
 
@@ -57,5 +57,85 @@ func TestImageImgurReal(t *testing.T) {
 
 	if status != 200 {
 		t.Fail()
+	}
+}
+
+func TestImageImgurFailure(t *testing.T) {
+	httpC, server := testHTTPClientJSON("{\"data\": {}, \"success\": false, \"status\": 200 }")
+	defer server.Close()
+
+	client := new(Client)
+	client.HTTPClient = httpC
+	client.Log = new(klogger.CLILogger)
+	client.ImgurClientID = "testing"
+
+	_, _, err := client.GetImageInfo("dummy")
+
+	if err == nil {
+		t.Error("GetImageInfo() should have failed, but didn't")
+	}
+}
+
+func TestImageImgurNotSuccess(t *testing.T) {
+	httpC, server := testHTTPClientJSON("{\"data\": {}, \"success\": false, \"status\": 200 }")
+	defer server.Close()
+
+	client := new(Client)
+	client.HTTPClient = httpC
+	client.Log = new(klogger.CLILogger)
+	client.ImgurClientID = "testing"
+
+	_, _, err := client.GetImageInfo("dummy")
+
+	if err == nil {
+		t.Error("GetImageInfo() should have failed, but didn't")
+	}
+}
+
+func TestImageImgurJSONError(t *testing.T) {
+	httpC, server := testHTTPClientInvalidJSON()
+	defer server.Close()
+
+	client := new(Client)
+	client.HTTPClient = httpC
+	client.Log = new(klogger.CLILogger)
+	client.ImgurClientID = "testing"
+
+	_, _, err := client.GetImageInfo("dummy")
+
+	if err == nil {
+		t.Error("GetImageInfo() should have failed, but didn't")
+	}
+}
+
+func TestImageImgurServerError(t *testing.T) {
+	httpC, server := testHTTPClient500()
+	defer server.Close()
+
+	client := new(Client)
+	client.HTTPClient = httpC
+	client.Log = new(klogger.CLILogger)
+	client.ImgurClientID = "testing"
+
+	_, _, err := client.GetImageInfo("dummy")
+
+	if err == nil {
+		t.Error("GetImageInfo() should have failed, but didn't")
+	}
+}
+
+func TestImageImgurError(t *testing.T) {
+	httpC, server := testHTTPClientJSON("{'data' : {}, 'success' : false, 'status'  : 500}")
+	defer server.Close()
+
+	client := new(Client)
+	client.HTTPClient = httpC
+	client.Log = new(klogger.CLILogger)
+	client.ImgurClientID = "testing"
+
+	_, _, err := client.GetImageInfo("dummy")
+
+	if err == nil {
+		t.Error("GetImageInfo() should have failed, but didn't")
 	}
 }
