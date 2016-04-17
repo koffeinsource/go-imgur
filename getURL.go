@@ -20,7 +20,7 @@ func (client *Client) getURL(URL string) (string, *RateLimit, error) {
 
 	req.Header.Add("Authorization", "Client-ID "+client.ImgurClientID)
 
-	// Make a request to the sorceURL
+	// Make a request to the sourceURL
 	res, err := client.HTTPClient.Do(req)
 	if err != nil {
 		return "", nil, errors.New("Could not get " + URL + " - " + err.Error())

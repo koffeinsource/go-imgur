@@ -11,7 +11,6 @@ import (
 
 func testHTTPClientJSON(json string) (*http.Client, *httptest.Server) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(200)
 		w.Header().Set("Content-Type", "application/json")
 		w.Header().Set("X-RateLimit-UserLimit", "10")
 		w.Header().Set("X-RateLimit-UserRemaining", "2")
@@ -19,6 +18,8 @@ func testHTTPClientJSON(json string) (*http.Client, *httptest.Server) {
 		w.Header().Set("X-RateLimit-ClientLimit", "40")
 		w.Header().Set("X-RateLimit-ClientRemaining", "5")
 		fmt.Fprintln(w, json)
+
+		w.WriteHeader(200)
 	}))
 
 	u, err := url.Parse(server.URL)
@@ -46,18 +47,18 @@ func testHTTPClient500() (*http.Client, *httptest.Server) {
 
 func testHTTPClientInvalidJSON() (*http.Client, *httptest.Server) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(200)
 		w.Header().Set("Content-Type", "application/json")
 
 		// some broken headers
-		w.Header().Set("X-RateLimit-UserLimit", "a")
-		w.Header().Set("X-RateLimit-UserRemaining", "b")
-		w.Header().Set("X-RateLimit-UserReset", "c")
-		w.Header().Set("X-RateLimit-ClientLimit", "d")
-		w.Header().Set("X-RateLimit-ClientRemaining", "e")
+		w.Header().Set("X-RateLimit-UserLimit", "asd123")
+		w.Header().Set("X-RateLimit-UserRemaining", "asd123")
+		w.Header().Set("X-RateLimit-UserReset", "asd123")
+		w.Header().Set("X-RateLimit-ClientLimit", "asd123")
+		w.Header().Set("X-RateLimit-ClientRemaining", "asd123")
 
 		// some invalid json
 		fmt.Fprintln(w, `[broken json.. :)]`)
+		w.WriteHeader(200)
 	}))
 
 	u, err := url.Parse(server.URL)

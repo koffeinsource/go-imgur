@@ -71,7 +71,7 @@ func extractRateLimits(h http.Header) (*RateLimit, error) {
 	clientLimitStr := h.Get("X-RateLimit-ClientLimit")
 	if clientLimitStr != "" {
 		clientLimit, err := strconv.ParseInt(clientLimitStr, 10, 32)
-		if err != nil && h.Get("X-RateLimit-ClientLimit") != "" {
+		if err != nil {
 			return nil, errors.New("Problem parsing X-RateLimit-ClientLimit header: " + err.Error())
 		}
 		rl.ClientLimit = clientLimit

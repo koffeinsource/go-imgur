@@ -61,39 +61,39 @@ func TestJsonError(t *testing.T) {
 	client.Log = new(klogger.CLILogger)
 	client.ImgurClientID = "testing"
 
-	_, err := client.GetRateLimit()
+	rl, err := client.GetRateLimit()
 
-	if err == nil {
+	if err == nil || rl != nil {
 		t.Error("GetRateLimit() should have failed, but didn't")
 	}
 
-	_, _, err = client.GetImageInfo("asd")
+	img, _, err := client.GetImageInfo("asd")
 
-	if err == nil {
+	if err == nil || img != nil {
 		t.Error("GetImageInfo() should have failed, but didn't")
 	}
 
-	_, _, err = client.GetAlbumInfo("asd")
+	ab, _, err := client.GetAlbumInfo("asd")
 
-	if err == nil {
+	if err == nil || ab != nil {
 		t.Error("GetAlbumInfo() should have failed, but didn't")
 	}
 
-	_, _, err = client.GetGalleryAlbumInfo("asd")
+	gab, _, err := client.GetGalleryAlbumInfo("asd")
 
-	if err == nil {
+	if err == nil || gab != nil {
 		t.Error("GetGalleryAlbumInfo() should have failed, but didn't")
 	}
 
-	_, _, err = client.GetGalleryImageInfo("asd")
+	gim, _, err := client.GetGalleryImageInfo("asd")
 
-	if err == nil {
+	if err == nil || gim != nil {
 		t.Error("GetGalleryImageInfo() should have failed, but didn't")
 	}
 
-	_, _, err = client.GetInfoFromURL("asd")
+	ge, _, err := client.GetInfoFromURL("asd")
 
-	if err == nil {
+	if err == nil || ge != nil {
 		t.Error("GetInfoFromURL() should have failed, but didn't")
 	}
 }
