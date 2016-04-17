@@ -189,3 +189,49 @@ func TestImgurError(t *testing.T) {
 		t.Error("GetInfoFromURL() should have failed, but didn't")
 	}
 }
+
+func TestServerDown(t *testing.T) {
+	httpC, server := testHTTPClient500()
+	server.Close()
+
+	client := new(Client)
+	client.HTTPClient = httpC
+	client.Log = new(klogger.CLILogger)
+	client.ImgurClientID = "testing"
+
+	_, err := client.GetRateLimit()
+
+	if err == nil {
+		t.Error("GetRateLimit() should have failed, but didn't")
+	}
+
+	_, _, err = client.GetImageInfo("asd")
+
+	if err == nil {
+		t.Error("GetImageInfo() should have failed, but didn't")
+	}
+
+	_, _, err = client.GetAlbumInfo("asd")
+
+	if err == nil {
+		t.Error("GetAlbumInfo() should have failed, but didn't")
+	}
+
+	_, _, err = client.GetGalleryAlbumInfo("asd")
+
+	if err == nil {
+		t.Error("GetGalleryAlbumInfo() should have failed, but didn't")
+	}
+
+	_, _, err = client.GetGalleryImageInfo("asd")
+
+	if err == nil {
+		t.Error("GetGalleryImageInfo() should have failed, but didn't")
+	}
+
+	_, _, err = client.GetInfoFromURL("asd")
+
+	if err == nil {
+		t.Error("GetInfoFromURL() should have failed, but didn't")
+	}
+}

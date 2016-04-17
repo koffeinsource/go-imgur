@@ -17,9 +17,9 @@ func testHTTPClientJSON(json string) (*http.Client, *httptest.Server) {
 		w.Header().Set("X-RateLimit-UserReset", "3")
 		w.Header().Set("X-RateLimit-ClientLimit", "40")
 		w.Header().Set("X-RateLimit-ClientRemaining", "5")
-		fmt.Fprintln(w, json)
-
 		w.WriteHeader(200)
+
+		fmt.Fprintln(w, json)
 	}))
 
 	u, err := url.Parse(server.URL)
@@ -55,10 +55,10 @@ func testHTTPClientInvalidJSON() (*http.Client, *httptest.Server) {
 		w.Header().Set("X-RateLimit-UserReset", "asd123")
 		w.Header().Set("X-RateLimit-ClientLimit", "asd123")
 		w.Header().Set("X-RateLimit-ClientRemaining", "asd123")
+		w.WriteHeader(200)
 
 		// some invalid json
 		fmt.Fprintln(w, `[broken json.. :)]`)
-		w.WriteHeader(200)
 	}))
 
 	u, err := url.Parse(server.URL)

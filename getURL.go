@@ -15,7 +15,7 @@ func (client *Client) getURL(URL string) (string, *RateLimit, error) {
 	client.Log.Infof("Requesting URL %v\n", URL)
 	req, err := http.NewRequest("GET", URL, nil)
 	if err != nil {
-		return "", nil, errors.New("Could create request for " + URL + " - " + err.Error())
+		return "", nil, errors.New("Could not create request for " + URL + " - " + err.Error())
 	}
 
 	req.Header.Add("Authorization", "Client-ID "+client.ImgurClientID)
