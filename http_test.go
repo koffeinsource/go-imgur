@@ -13,10 +13,10 @@ func testHTTPClientJSON(json string) (*http.Client, *httptest.Server) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 		w.Header().Set("Content-Type", "application/json")
-		w.Header().Set("X-RateLimit-UserLimit", "1")
+		w.Header().Set("X-RateLimit-UserLimit", "10")
 		w.Header().Set("X-RateLimit-UserRemaining", "2")
 		w.Header().Set("X-RateLimit-UserReset", "3")
-		w.Header().Set("X-RateLimit-ClientLimit", "4")
+		w.Header().Set("X-RateLimit-ClientLimit", "40")
 		w.Header().Set("X-RateLimit-ClientRemaining", "5")
 		fmt.Fprintln(w, json)
 	}))

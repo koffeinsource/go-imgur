@@ -1,0 +1,191 @@
+package imgur
+
+import (
+	"testing"
+
+	"github.com/koffeinsource/go-klogger"
+)
+
+func TestImgurNotSuccess(t *testing.T) {
+	httpC, server := testHTTPClientJSON("{\"data\": {}, \"success\": false, \"status\": 200 }")
+	defer server.Close()
+
+	client := new(Client)
+	client.HTTPClient = httpC
+	client.Log = new(klogger.CLILogger)
+	client.ImgurClientID = "testing"
+
+	_, err := client.GetRateLimit()
+
+	if err == nil {
+		t.Error("GetRateLimit() should have failed, but didn't")
+	}
+
+	_, _, err = client.GetImageInfo("asd")
+
+	if err == nil {
+		t.Error("GetImageInfo() should have failed, but didn't")
+	}
+
+	_, _, err = client.GetAlbumInfo("asd")
+
+	if err == nil {
+		t.Error("GetAlbumInfo() should have failed, but didn't")
+	}
+
+	_, _, err = client.GetGalleryAlbumInfo("asd")
+
+	if err == nil {
+		t.Error("GetGalleryAlbumInfo() should have failed, but didn't")
+	}
+
+	_, _, err = client.GetGalleryImageInfo("asd")
+
+	if err == nil {
+		t.Error("GetGalleryImageInfo() should have failed, but didn't")
+	}
+
+	_, _, err = client.GetInfoFromURL("asd")
+
+	if err == nil {
+		t.Error("GetInfoFromURL() should have failed, but didn't")
+	}
+}
+
+func TestJsonError(t *testing.T) {
+	httpC, server := testHTTPClientInvalidJSON()
+	defer server.Close()
+
+	client := new(Client)
+	client.HTTPClient = httpC
+	client.Log = new(klogger.CLILogger)
+	client.ImgurClientID = "testing"
+
+	_, err := client.GetRateLimit()
+
+	if err == nil {
+		t.Error("GetRateLimit() should have failed, but didn't")
+	}
+
+	_, _, err = client.GetImageInfo("asd")
+
+	if err == nil {
+		t.Error("GetImageInfo() should have failed, but didn't")
+	}
+
+	_, _, err = client.GetAlbumInfo("asd")
+
+	if err == nil {
+		t.Error("GetAlbumInfo() should have failed, but didn't")
+	}
+
+	_, _, err = client.GetGalleryAlbumInfo("asd")
+
+	if err == nil {
+		t.Error("GetGalleryAlbumInfo() should have failed, but didn't")
+	}
+
+	_, _, err = client.GetGalleryImageInfo("asd")
+
+	if err == nil {
+		t.Error("GetGalleryImageInfo() should have failed, but didn't")
+	}
+
+	_, _, err = client.GetInfoFromURL("asd")
+
+	if err == nil {
+		t.Error("GetInfoFromURL() should have failed, but didn't")
+	}
+}
+
+func TestServerError(t *testing.T) {
+	httpC, server := testHTTPClient500()
+	defer server.Close()
+
+	client := new(Client)
+	client.HTTPClient = httpC
+	client.Log = new(klogger.CLILogger)
+	client.ImgurClientID = "testing"
+
+	_, err := client.GetRateLimit()
+
+	if err == nil {
+		t.Error("GetRateLimit() should have failed, but didn't")
+	}
+
+	_, _, err = client.GetImageInfo("asd")
+
+	if err == nil {
+		t.Error("GetImageInfo() should have failed, but didn't")
+	}
+
+	_, _, err = client.GetAlbumInfo("asd")
+
+	if err == nil {
+		t.Error("GetAlbumInfo() should have failed, but didn't")
+	}
+
+	_, _, err = client.GetGalleryAlbumInfo("asd")
+
+	if err == nil {
+		t.Error("GetGalleryAlbumInfo() should have failed, but didn't")
+	}
+
+	_, _, err = client.GetGalleryImageInfo("asd")
+
+	if err == nil {
+		t.Error("GetGalleryImageInfo() should have failed, but didn't")
+	}
+
+	_, _, err = client.GetInfoFromURL("asd")
+
+	if err == nil {
+		t.Error("GetInfoFromURL() should have failed, but didn't")
+	}
+}
+
+func TestImgurError(t *testing.T) {
+	httpC, server := testHTTPClientJSON("{'data' : {}, 'success' : false, 'status'  : 500}")
+	defer server.Close()
+
+	client := new(Client)
+	client.HTTPClient = httpC
+	client.Log = new(klogger.CLILogger)
+	client.ImgurClientID = "testing"
+
+	_, err := client.GetRateLimit()
+
+	if err == nil {
+		t.Error("GetRateLimit() should have failed, but didn't")
+	}
+
+	_, _, err = client.GetImageInfo("asd")
+
+	if err == nil {
+		t.Error("GetImageInfo() should have failed, but didn't")
+	}
+
+	_, _, err = client.GetAlbumInfo("asd")
+
+	if err == nil {
+		t.Error("GetAlbumInfo() should have failed, but didn't")
+	}
+
+	_, _, err = client.GetGalleryAlbumInfo("asd")
+
+	if err == nil {
+		t.Error("GetGalleryAlbumInfo() should have failed, but didn't")
+	}
+
+	_, _, err = client.GetGalleryImageInfo("asd")
+
+	if err == nil {
+		t.Error("GetGalleryImageInfo() should have failed, but didn't")
+	}
+
+	_, _, err = client.GetInfoFromURL("asd")
+
+	if err == nil {
+		t.Error("GetInfoFromURL() should have failed, but didn't")
+	}
+}
