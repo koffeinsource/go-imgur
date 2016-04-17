@@ -47,7 +47,7 @@ func TestImageImgurReal(t *testing.T) {
 	img, status, err := client.GetImageInfo("ClF8rLe")
 
 	if err != nil {
-		t.Errorf("GetRateLimit() failed with error: %v", err)
+		t.Errorf("GetImageInfo() failed with error: %v", err)
 		t.FailNow()
 	}
 

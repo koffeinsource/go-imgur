@@ -103,5 +103,4 @@ func (client *Client) GetRateLimit() (*RateLimit, error) {
 	ret.UserReset = time.Unix(rl.Rl.UserReset, 0)
 
 	return &ret, nil
-
 }
