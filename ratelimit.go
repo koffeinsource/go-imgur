@@ -38,55 +38,39 @@ type RateLimit struct {
 	ClientRemaining int64
 }
 
-func extractRateLimits(h http.Header) (*RateLimit, error) {
-	var rl RateLimit
+func extractRateLimits(h http.Header) (rl *RateLimit, err error) {
+	err = nil
+	var r RateLimit
+	rl = &r
 
 	userLimitStr := h.Get("X-RateLimit-UserLimit")
 	if userLimitStr != "" {
-		userLimit, err := strconv.ParseInt(userLimitStr, 10, 32)
-		if err != nil {
-			return nil, errors.New("Problem parsing X-RateLimit-UserLimit header: " + err.Error())
-		}
-		rl.UserLimit = userLimit
+		rl.UserLimit, err = strconv.ParseInt(userLimitStr, 10, 32)
 	}
 
 	userRemainingStr := h.Get("X-RateLimit-UserRemaining")
 	if userRemainingStr != "" {
-		userRemaining, err := strconv.ParseInt(userRemainingStr, 10, 32)
-		if err != nil {
-			return nil, errors.New("Problem parsing X-RateLimit-UserRemaining header: " + err.Error())
-		}
-		rl.UserRemaining = userRemaining
+		rl.UserRemaining, err = strconv.ParseInt(userRemainingStr, 10, 32)
 	}
 
 	unixTimeStr := h.Get("X-RateLimit-UserReset")
 	if unixTimeStr != "" {
-		userReset, err := strconv.ParseInt(unixTimeStr, 10, 64)
-		if err != nil {
-			return nil, errors.New("Problem parsing X-RateLimit-UserReset header: " + err.Error())
-		}
+		var userReset int64
+		userReset, err = strconv.ParseInt(unixTimeStr, 10, 64)
 		rl.UserReset = time.Unix(userReset, 0)
 	}
 
 	clientLimitStr := h.Get("X-RateLimit-ClientLimit")
 	if clientLimitStr != "" {
-		clientLimit, err := strconv.ParseInt(clientLimitStr, 10, 32)
-		if err != nil {
-			return nil, errors.New("Problem parsing X-RateLimit-ClientLimit header: " + err.Error())
-		}
-		rl.ClientLimit = clientLimit
+		rl.ClientLimit, err = strconv.ParseInt(clientLimitStr, 10, 32)
 	}
 
 	clientRemainingStr := h.Get("X-RateLimit-ClientRemaining")
 	if clientRemainingStr != "" {
-		clientRemaining, err := strconv.ParseInt(clientRemainingStr, 10, 32)
-		if err != nil {
-			return nil, errors.New("Problem parsing X-RateLimit-ClientRemaining header: " + err.Error())
-		}
-		rl.ClientRemaining = clientRemaining
+		rl.ClientRemaining, err = strconv.ParseInt(clientRemainingStr, 10, 32)
 	}
 
-	return &rl, nil
+	return
 }
 
 // GetRateLimit returns the current rate limit without doing anything else
