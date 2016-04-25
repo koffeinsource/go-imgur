@@ -81,7 +81,7 @@ func main() {
 	flag.Parse()
 
 	// Check if there is anything todo
-	if *imgurClientID == "" || (*image == "" && *album == "" && *gimage == "" && *galbum == "" && *upload == "" && *url == "" && *rate == false) {
+	if flag.NFlag() >= 2 || *imgurClientID == "" {
 		flag.PrintDefaults()
 		return
 	}

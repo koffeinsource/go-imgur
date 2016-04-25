@@ -19,93 +19,115 @@ type GenericInfo struct {
 // returns image/album info, status code of the request, error
 func (client *Client) GetInfoFromURL(url string) (*GenericInfo, int, error) {
 	url = strings.TrimSpace(url)
-	var ret GenericInfo
 
 	// https://i.imgur.com/<id>.jpg -> image
 	if strings.Contains(url, "://i.imgur.com/") {
-		start := strings.LastIndex(url, "/") + 1
-		end := strings.LastIndex(url, ".")
-		if start+1 >= end {
-			return nil, -1, errors.New("Could not find ID in URL " + url + ". I was going down i.imgur.com path.")
-		}
-		id := url[start:end]
-		client.Log.Debugf("Detected imgur image ID %v. Was going down the i.imgur.com/ path.", id)
-		gii, status, err := client.GetGalleryImageInfo(id)
-		if status < 400 {
-			ret.GImage = gii
-		} else {
-			var ii *ImageInfo
-			ii, status, err = client.GetImageInfo(id)
-			ret.Image = ii
-		}
-		return &ret, status, err
+		return client.directImageURL(url)
 	}
 
 	// https://imgur.com/a/<id> -> album
 	if strings.Contains(url, "://imgur.com/a/") || strings.Contains(url, "://m.imgur.com/a/") {
-		start := strings.LastIndex(url, "/") + 1
-		end := strings.LastIndex(url, "?")
-		if end == -1 {
-			end = len(url)
-		}
-		id := url[start:end]
-		if id == "" {
-			return nil, -1, errors.New("Could not find ID in URL " + url + ". I was going down imgur.com/a/ path.")
-		}
-		client.Log.Debugf("Detected imgur album ID %v. Was going down the imgur.com/a/ path.", id)
-		ai, status, err := client.GetAlbumInfo(id)
-		ret.Album = ai
-		return &ret, status, err
+		return client.albumURL(url)
 	}
 
 	// https://imgur.com/gallery/<id> len(id) == 5 -> gallery album
 	// https://imgur.com/gallery/<id> len(id) == 7 -> gallery image
 	if strings.Contains(url, "://imgur.com/gallery/") || strings.Contains(url, "://m.imgur.com/gallery/") {
-		start := strings.LastIndex(url, "/") + 1
-		end := strings.LastIndex(url, "?")
-		if end == -1 {
-			end = len(url)
-		}
-		id := url[start:end]
-		if id == "" {
-			return nil, -1, errors.New("Could not find ID in URL " + url + ". I was going down imgur.com/gallery/ path.")
-		}
-		client.Log.Debugf("Detected imgur gallery ID %v. Was going down the imgur.com/gallery/ path.", id)
-		if len(id) == 5 {
-			client.Log.Debugf("Detected imgur gallery album.")
-			ai, status, err := client.GetGalleryAlbumInfo(id)
-			ret.GAlbum = ai
-			return &ret, status, err
-		}
-
-		ii, status, err := client.GetGalleryImageInfo(id)
-		ret.GImage = ii
-		return &ret, status, err
+		return client.galleryURL(url)
 	}
 
 	// https://imgur.com/<id> -> image
 	if strings.Contains(url, "://imgur.com/") || strings.Contains(url, "://m.imgur.com/") {
-		start := strings.LastIndex(url, "/") + 1
-		end := strings.LastIndex(url, "?")
-		if end == -1 {
-			end = len(url)
-		}
-		id := url[start:end]
-		if id == "" {
-			return nil, -1, errors.New("Could not find ID in URL " + url + ". I was going down imgur.com/ path.")
-		}
-		client.Log.Debugf("Detected imgur image ID %v. Was going down the imgur.com/ path.", id)
-		ii, status, err := client.GetGalleryImageInfo(id)
-		if err == nil && status < 400 {
-			ret.GImage = ii
-
-			return &ret, status, err
-		}
-
-		i, st, err := client.GetImageInfo(id)
-		ret.Image = i
-		return &ret, st, err
+		return client.imageURL(url)
 	}
 
 	return nil, -1, errors.New("URL pattern matching for URL " + url + " failed.")
+}
+
+func (client *Client) directImageURL(url string) (*GenericInfo, int, error) {
+	var ret GenericInfo
+	start := strings.LastIndex(url, "/") + 1
+	end := strings.LastIndex(url, ".")
+	if start+1 >= end {
+		return nil, -1, errors.New("Could not find ID in URL " + url + ". I was going down i.imgur.com path.")
+	}
+	id := url[start:end]
+	client.Log.Debugf("Detected imgur image ID %v. Was going down the i.imgur.com/ path.", id)
+	gii, status, err := client.GetGalleryImageInfo(id)
+	if status < 400 {
+		ret.GImage = gii
+	} else {
+		var ii *ImageInfo
+		ii, status, err = client.GetImageInfo(id)
+		ret.Image = ii
+	}
+	return &ret, status, err
+}
+
+func (client *Client) albumURL(url string) (*GenericInfo, int, error) {
+	var ret GenericInfo
+
+	start := strings.LastIndex(url, "/") + 1
+	end := strings.LastIndex(url, "?")
+	if end == -1 {
+		end = len(url)
+	}
+	id := url[start:end]
+	if id == "" {
+		return nil, -1, errors.New("Could not find ID in URL " + url + ". I was going down imgur.com/a/ path.")
+	}
+	client.Log.Debugf("Detected imgur album ID %v. Was going down the imgur.com/a/ path.", id)
+	ai, status, err := client.GetAlbumInfo(id)
+	ret.Album = ai
+	return &ret, status, err
+}
+
+func (client *Client) galleryURL(url string) (*GenericInfo, int, error) {
+	var ret GenericInfo
+
+	start := strings.LastIndex(url, "/") + 1
+	end := strings.LastIndex(url, "?")
+	if end == -1 {
+		end = len(url)
+	}
+	id := url[start:end]
+	if id == "" {
+		return nil, -1, errors.New("Could not find ID in URL " + url + ". I was going down imgur.com/gallery/ path.")
+	}
+	client.Log.Debugf("Detected imgur gallery ID %v. Was going down the imgur.com/gallery/ path.", id)
+	if len(id) == 5 {
+		client.Log.Debugf("Detected imgur gallery album.")
+		ai, status, err := client.GetGalleryAlbumInfo(id)
+		ret.GAlbum = ai
+		return &ret, status, err
+	}
+
+	ii, status, err := client.GetGalleryImageInfo(id)
+	ret.GImage = ii
+	return &ret, status, err
+}
+
+func (client *Client) imageURL(url string) (*GenericInfo, int, error) {
+	var ret GenericInfo
+
+	start := strings.LastIndex(url, "/") + 1
+	end := strings.LastIndex(url, "?")
+	if end == -1 {
+		end = len(url)
+	}
+	id := url[start:end]
+	if id == "" {
+		return nil, -1, errors.New("Could not find ID in URL " + url + ". I was going down imgur.com/ path.")
+	}
+	client.Log.Debugf("Detected imgur image ID %v. Was going down the imgur.com/ path.", id)
+	ii, status, err := client.GetGalleryImageInfo(id)
+	if err == nil && status < 400 {
+		ret.GImage = ii
+
+		return &ret, status, err
+	}
+
+	i, st, err := client.GetImageInfo(id)
+	ret.Image = i
+	return &ret, st, err
 }
