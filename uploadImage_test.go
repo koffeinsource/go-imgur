@@ -75,7 +75,7 @@ func TestUploadImageSimulated(t *testing.T) {
 	client.Log = new(klogger.CLILogger)
 	client.ImgurClientID = "testing"
 
-	ii, status, err := client.UploadImageFromFile("test_data/testImage.jpg", "", title, descr)
+	ii, status, err := client.UploadImageFromFile("test_data/testImage.jpg", "ALBUMID", title, descr)
 
 	if err != nil || ii == nil {
 		t.Errorf("UploadImageFromFile() failed with error: %v", err)

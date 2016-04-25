@@ -50,6 +50,13 @@ func TestImgurNotSuccess(t *testing.T) {
 	if err == nil {
 		t.Error("GetInfoFromURL() should have failed, but didn't")
 	}
+
+	var im []byte
+	_, _, err = client.UploadImage(im, "", "binary", "t", "d")
+
+	if err == nil {
+		t.Error("UploadImage() should have failed, but didn't")
+	}
 }
 
 func TestJsonError(t *testing.T) {
@@ -96,6 +103,14 @@ func TestJsonError(t *testing.T) {
 	if err == nil || ge != nil {
 		t.Error("GetInfoFromURL() should have failed, but didn't")
 	}
+
+	var im []byte
+	img, _, err = client.UploadImage(im, "", "binary", "t", "d")
+
+	if err == nil || img != nil {
+		t.Error("UploadImage() should have failed, but didn't")
+	}
+
 }
 
 func TestServerError(t *testing.T) {
@@ -141,6 +156,13 @@ func TestServerError(t *testing.T) {
 
 	if err == nil {
 		t.Error("GetInfoFromURL() should have failed, but didn't")
+	}
+
+	var im []byte
+	_, _, err = client.UploadImage(im, "", "binary", "t", "d")
+
+	if err == nil {
+		t.Error("UploadImage() should have failed, but didn't")
 	}
 }
 
@@ -188,6 +210,13 @@ func TestImgurError(t *testing.T) {
 	if err == nil {
 		t.Error("GetInfoFromURL() should have failed, but didn't")
 	}
+
+	var im []byte
+	_, _, err = client.UploadImage(im, "", "binary", "t", "d")
+
+	if err == nil {
+		t.Error("UploadImage() should have failed, but didn't")
+	}
 }
 
 func TestServerDown(t *testing.T) {
@@ -233,5 +262,12 @@ func TestServerDown(t *testing.T) {
 
 	if err == nil {
 		t.Error("GetInfoFromURL() should have failed, but didn't")
+	}
+
+	var im []byte
+	_, _, err = client.UploadImage(im, "", "binary", "t", "d")
+
+	if err == nil {
+		t.Error("UploadImage() should have failed, but didn't")
 	}
 }
