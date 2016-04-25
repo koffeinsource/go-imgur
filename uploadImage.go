@@ -24,8 +24,8 @@ func (client *Client) UploadImage(image []byte, album string, dtype string, titl
 	if image == nil {
 		return nil, -1, errors.New("Invalid image.")
 	}
-	if dtype != "binary" && dtype != "base64" && dtype != "URL" {
-		return nil, -1, errors.New("Passed invalid dtype: " + dtype + ". Please use binary/base64/URL.")
+	if dtype != "file" && dtype != "base64" && dtype != "URL" {
+		return nil, -1, errors.New("Passed invalid dtype: " + dtype + ". Please use file/base64/URL.")
 	}
 
 	form := createUploadForm(image, album, dtype, title, description)
@@ -77,18 +77,8 @@ func (client *Client) UploadImage(image []byte, album string, dtype string, titl
 func createUploadForm(image []byte, album string, dtype string, title string, description string) url.Values {
 	form := url.Values{}
 
-	if dtype == "binary" {
-		form.Add("image", string(image[:]))
-		form.Add("type", "file")
-	}
-	if dtype == "base64" {
-		form.Add("image", string(image[:]))
-		form.Add("type", "base64")
-	}
-	if dtype == "URL" {
-		form.Add("image", string(image[:]))
-		form.Add("type", "URL")
-	}
+	form.Add("image", string(image[:]))
+	form.Add("type", dtype)
 
 	if album != "" {
 		form.Add("album", album)
@@ -124,5 +114,5 @@ func (client *Client) UploadImageFromFile(filename string, album string, title s
 
 	//base := base64.StdEncoding.EncodeToString(b)
 
-	return client.UploadImage(b, album, "binary", title, description)
+	return client.UploadImage(b, album, "file", title, description)
 }
