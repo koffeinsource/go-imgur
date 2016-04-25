@@ -32,7 +32,7 @@ func (client *Client) UploadImage(image []byte, album string, dtype string, titl
 
 	URL := apiEndpoint + "image"
 	req, err := http.NewRequest("POST", URL, bytes.NewBufferString(form.Encode()))
-	client.Log.Infof("Posting to URL %v\n", URL)
+	client.Log.Debugf("Posting to URL %v\n", URL)
 	if err != nil {
 		return nil, -1, errors.New("Could create request for " + URL + " - " + err.Error())
 	}
@@ -49,7 +49,7 @@ func (client *Client) UploadImage(image []byte, album string, dtype string, titl
 	// Read the whole body
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		return nil, -1, errors.New("Problem reading the body for " + URL + " - " + err.Error())
+		return nil, -1, errors.New("Problem reading the body of " + URL + " - " + err.Error())
 	}
 
 	// client.Log.Debugf("%v\n", string(body[:]))
@@ -111,8 +111,6 @@ func (client *Client) UploadImageFromFile(filename string, album string, title s
 	if err != nil || int64(n) != size {
 		return nil, 500, fmt.Errorf("Could not read file %v - Error: %v", filename, err)
 	}
-
-	//base := base64.StdEncoding.EncodeToString(b)
 
 	return client.UploadImage(b, album, "file", title, description)
 }
