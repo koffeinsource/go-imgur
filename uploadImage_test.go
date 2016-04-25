@@ -37,6 +37,12 @@ func TestUploadImageErrors(t *testing.T) {
 		t.Error("UploadImage() did not result in an error even though it should have.")
 		t.Fail()
 	}
+
+	ii, _, err = client.UploadImageFromFile("notExistingFile.youtcantseeme", "", title, descr)
+	if err == nil && ii == nil {
+		t.Error("UploadImageFromFile() did not result in an error even though it should have.")
+		t.Fail()
+	}
 }
 
 func TestUploadImageReal(t *testing.T) {
