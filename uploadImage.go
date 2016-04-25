@@ -4,9 +4,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"os"
 	"strconv"
 )
 
@@ -59,6 +61,7 @@ func (client *Client) UploadImage(image []byte, album string, dtype string, titl
 	}
 
 	if !img.Success {
+		fmt.Printf("form: %v\n", form)
 		return nil, img.Status, errors.New("Upload to imgur failed with status: " + strconv.Itoa(img.Status))
 	}
 
@@ -99,4 +102,31 @@ func createUploadForm(image []byte, album string, dtype string, title string, de
 	}
 
 	return form
+}
+
+// UploadImageFromFile uploads a file given by the filename string to imgur.
+func (client *Client) UploadImageFromFile(filename string, album string, title string, description string) (*ImageInfo, int, error) {
+	client.Log.Infof("*** IMAGE UPLOAD ***\n")
+	f, err := os.Open(filename)
+	if err != nil {
+		err2 := fmt.Errorf("Could not open file %v - Error: %v", filename, err)
+		return nil, 500, err2
+	}
+	defer f.Close()
+	fileinfo, err := f.Stat()
+	if err != nil {
+		err2 := fmt.Errorf("Could not stat file %v - Error: %v", filename, err)
+		return nil, 500, err2
+	}
+	size := fileinfo.Size()
+	b := make([]byte, size)
+	n, err := f.Read(b)
+	if err != nil || int64(n) != size {
+		err2 := fmt.Errorf("Could not read file %v - Error: %v", filename, err)
+		return nil, 500, err2
+	}
+
+	//base := base64.StdEncoding.EncodeToString(b)
+
+	return client.UploadImage(b, album, "binary", title, description)
 }

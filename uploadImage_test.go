@@ -1,9 +1,16 @@
 package imgur
 
 import (
+	"net/http"
+	"os"
 	"testing"
 
 	"github.com/koffeinsource/go-klogger"
+)
+
+const (
+	descr = "test upload for the go-imgr library"
+	title = "go-imgur test upload"
 )
 
 func TestUploadImageErrors(t *testing.T) {
@@ -28,6 +35,58 @@ func TestUploadImageErrors(t *testing.T) {
 	ii, _, err = client.UploadImage(img, "album", "type", "name", "desc")
 	if err == nil && ii == nil {
 		t.Error("UploadImage() did not result in an error even though it should have.")
+		t.Fail()
+	}
+}
+
+func TestUploadImageReal(t *testing.T) {
+	key := os.Getenv("IMGURCLIENTID")
+	if key == "" {
+		t.Skip("IMGURCLIENTID environment variable not set.")
+	}
+
+	client := new(Client)
+	client.HTTPClient = new(http.Client)
+	client.Log = new(klogger.CLILogger)
+	client.ImgurClientID = key
+
+	ii, status, err := client.UploadImageFromFile("test_data/testImage.jpg", "", title, descr)
+
+	if err != nil || ii == nil {
+		t.Errorf("UploadImageFromFile() failed with error: %v", err)
+		t.FailNow()
+	}
+
+	if ii.Description != descr || ii.Title != title {
+		t.Fail()
+	}
+
+	if status != 200 {
+		t.Fail()
+	}
+}
+
+func TestUploadImageSimulated(t *testing.T) {
+	httpC, server := testHTTPClientJSON("{\"data\":{\"id\":\"ClF8rLe\",\"title\":\"" + title + "\",\"description\":\"" + descr + "\",\"datetime\":1451248840,\"type\":\"image\\/jpeg\",\"animated\":false,\"width\":2448,\"height\":3264,\"size\":1071339,\"views\":176,\"bandwidth\":188555664,\"vote\":null,\"favorite\":false,\"nsfw\":null,\"section\":null,\"account_url\":null,\"account_id\":null,\"in_gallery\":false,\"link\":\"http:\\/\\/i.imgur.com\\/ClF8rLe.jpg\"},\"success\":true,\"status\":200}")
+	defer server.Close()
+
+	client := new(Client)
+	client.HTTPClient = httpC
+	client.Log = new(klogger.CLILogger)
+	client.ImgurClientID = "testing"
+
+	ii, status, err := client.UploadImageFromFile("test_data/testImage.jpg", "", title, descr)
+
+	if err != nil || ii == nil {
+		t.Errorf("UploadImageFromFile() failed with error: %v", err)
+		t.FailNow()
+	}
+
+	if ii.Description != descr || ii.Title != title {
+		t.Fail()
+	}
+
+	if status != 200 {
 		t.Fail()
 	}
 }

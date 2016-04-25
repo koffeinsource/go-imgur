@@ -2,41 +2,12 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"net/http"
-	"os"
 
 	"github.com/koffeinsource/go-imgur"
 	"github.com/koffeinsource/go-klogger"
 )
-
-func uploadFile(client *imgur.Client, upload *string) {
-	client.Log.Infof("*** IMAGE UPLOAD ***\n")
-	f, err := os.Open(*upload)
-	if err != nil {
-		client.Log.Errorf("Could not open file %v - Error: %v", *upload, err)
-		return
-	}
-	defer f.Close()
-	fileinfo, err := f.Stat()
-	if err != nil {
-		client.Log.Errorf("Could not stat file %v - Error: %v", *upload, err)
-		return
-	}
-	size := fileinfo.Size()
-	b := make([]byte, size)
-	n, err := f.Read(b)
-	if err != nil || int64(n) != size {
-		client.Log.Errorf("Could not read file %v - Error: %v", *upload, err)
-		return
-	}
-
-	img, _, err := client.UploadImage(b, "", "binary", "test upload", "test desc")
-	if err != nil {
-		client.Log.Errorf("Error in UploadImage: %v\n", err)
-		return
-	}
-	client.Log.Infof("%v\n", img)
-}
 
 func printRate(client *imgur.Client) {
 	client.Log.Infof("*** RATE LIMIT ***\n")
@@ -121,7 +92,11 @@ func main() {
 	client.ImgurClientID = *imgurClientID
 
 	if *upload != "" {
-		uploadFile(client, upload)
+		_, st, err := client.UploadImageFromFile(*upload, "", "test title", "test desc")
+		if st != 200 || err != nil {
+			fmt.Printf("Status: %v\n", st)
+			fmt.Printf("Err: %v\n", err)
+		}
 	}
 
 	if *rate {
