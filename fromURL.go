@@ -96,8 +96,15 @@ func (client *Client) GetInfoFromURL(url string) (*GenericInfo, int, error) {
 		}
 		client.Log.Debugf("Detected imgur image ID %v. Was going down the imgur.com/ path.", id)
 		ii, status, err := client.GetGalleryImageInfo(id)
-		ret.GImage = ii
-		return &ret, status, err
+		if err == nil && status < 400 {
+			ret.GImage = ii
+
+			return &ret, status, err
+		}
+
+		i, st, err := client.GetImageInfo(id)
+		ret.Image = i
+		return &ret, st, err
 	}
 
 	return nil, -1, errors.New("URL pattern matching for URL " + url + " failed.")

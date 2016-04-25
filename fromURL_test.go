@@ -197,11 +197,6 @@ func TestGetURLGalleryImageSimulated(t *testing.T) {
 
 	img := ge.GImage
 
-	if err != nil {
-		t.Errorf("GetImageInfo() failed with error: %v", err)
-		t.FailNow()
-	}
-
 	if img.Title != "The Tridge. (three way bridge)" || img.Animated != false || img.Bandwidth != 359974438182 || img.Datetime != 1316367003 || img.Description != "" || img.Height != 1133 || img.Width != 1700 || img.ID != "uPI76jY" || img.Link != "http://i.imgur.com/uPI76jY.jpg" || img.Views != 1342557 {
 		t.Fail()
 	}
@@ -242,5 +237,116 @@ func TestGetURLGalleryImageReal(t *testing.T) {
 
 	if status != 200 {
 		t.Fail()
+	}
+}
+
+func TestGetURLImageSimulated(t *testing.T) {
+	httpC, server := testHTTPClientJSON("{\"data\":{\"id\":\"ClF8rLe\",\"title\":null,\"description\":null,\"datetime\":1451248840,\"type\":\"image\\/jpeg\",\"animated\":false,\"width\":2448,\"height\":3264,\"size\":1071339,\"views\":176,\"bandwidth\":188555664,\"vote\":null,\"favorite\":false,\"nsfw\":null,\"section\":null,\"account_url\":null,\"account_id\":null,\"in_gallery\":false,\"link\":\"http:\\/\\/i.imgur.com\\/ClF8rLe.jpg\"},\"success\":true,\"status\":200}")
+	defer server.Close()
+
+	client := new(Client)
+	client.HTTPClient = httpC
+	client.Log = new(klogger.CLILogger)
+	client.ImgurClientID = "testing"
+
+	ge, status, err := client.GetInfoFromURL("http://imgur.com/ClF8rLe")
+
+	if err != nil {
+		t.Errorf("GetInfoFromURL() failed with error: %v", err)
+		t.FailNow()
+	}
+
+	if ge.Album != nil || ge.GAlbum != nil {
+		t.Error("GetInfoFromURL() failed. Returned wrong type.")
+		t.FailNow()
+	}
+
+	if ge.Image == nil && ge.GImage == nil {
+		t.FailNow()
+	}
+
+	if ge.Image != nil {
+		img := ge.Image
+
+		if img.Animated != false || img.Bandwidth != 188555664 || img.Datetime != 1451248840 || img.Description != "" || img.Height != 3264 || img.Width != 2448 || img.ID != "ClF8rLe" || img.Link != "http://i.imgur.com/ClF8rLe.jpg" || img.Views != 176 {
+			t.Fail()
+		}
+	}
+
+	if ge.GImage != nil {
+		img := ge.GImage
+
+		if img.Animated != false || img.Bandwidth != 188555664 || img.Datetime != 1451248840 || img.Description != "" || img.Height != 3264 || img.Width != 2448 || img.ID != "ClF8rLe" || img.Link != "http://i.imgur.com/ClF8rLe.jpg" || img.Views != 176 {
+			t.Fail()
+		}
+	}
+
+	if status != 200 {
+		t.Fail()
+	}
+}
+
+func TestGetURLImageReal(t *testing.T) {
+	key := os.Getenv("IMGURCLIENTID")
+	if key == "" {
+		t.Skip("IMGURCLIENTID environment variable not set.")
+	}
+
+	client := new(Client)
+	client.HTTPClient = new(http.Client)
+	client.Log = new(klogger.CLILogger)
+	client.ImgurClientID = key
+
+	ge, status, err := client.GetInfoFromURL("http://imgur.com/ClF8rLe")
+
+	if err != nil {
+		t.Errorf("GetInfoFromURL() failed with error: %v", err)
+		t.FailNow()
+	}
+
+	if ge.Album != nil || ge.GAlbum != nil {
+		t.Error("GetInfoFromURL() failed. Returned wrong type.")
+		t.FailNow()
+	}
+
+	if ge.Image == nil && ge.GImage == nil {
+		t.FailNow()
+	}
+
+	if ge.Image != nil {
+		img := ge.Image
+
+		if img.Animated != false || img.Datetime != 1451248840 || img.Description != "" || img.Height != 3264 || img.Width != 2448 || img.ID != "ClF8rLe" || img.Link != "http://i.imgur.com/ClF8rLe.jpg" {
+			t.Fail()
+		}
+	}
+
+	if ge.GImage != nil {
+		img := ge.GImage
+
+		if img.Animated != false || img.Datetime != 1451248840 || img.Description != "" || img.Height != 3264 || img.Width != 2448 || img.ID != "ClF8rLe" || img.Link != "http://i.imgur.com/ClF8rLe.jpg" {
+			t.Fail()
+		}
+	}
+
+	if status != 200 {
+		t.Fail()
+	}
+}
+
+func TestGetFromURLImageNoID(t *testing.T) {
+	httpC, server := testHTTPClient500()
+	defer server.Close()
+
+	client := new(Client)
+	client.HTTPClient = httpC
+	client.Log = new(klogger.CLILogger)
+	client.ImgurClientID = "testing"
+
+	_, _, err := client.GetInfoFromURL("http://imgur.com/")
+
+	if err == nil {
+		t.Error("GetInfoFromURL() did not failed but should have.")
+		t.FailNow()
 	}
 }
