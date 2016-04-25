@@ -64,12 +64,7 @@ func (client *Client) UploadImage(image []byte, album string, dtype string, titl
 		return nil, img.Status, errors.New("Upload to imgur failed with status: " + strconv.Itoa(img.Status))
 	}
 
-	rl, err := extractRateLimits(res.Header)
-	if err != nil {
-		client.Log.Infof("Problem with extracting rate limits: %v", err)
-	} else {
-		img.Ii.Limit = rl
-	}
+	img.Ii.Limit, _ = extractRateLimits(res.Header)
 
 	return img.Ii, img.Status, nil
 }
