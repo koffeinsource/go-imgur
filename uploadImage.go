@@ -30,7 +30,7 @@ func (client *Client) UploadImage(image []byte, album string, dtype string, titl
 
 	form := createUploadForm(image, album, dtype, title, description)
 
-	URL := apiEndpoint + "image"
+	URL := client.createAPIURL("image")
 	req, err := http.NewRequest("POST", URL, bytes.NewBufferString(form.Encode()))
 	client.Log.Debugf("Posting to URL %v\n", URL)
 	if err != nil {
@@ -39,6 +39,9 @@ func (client *Client) UploadImage(image []byte, album string, dtype string, titl
 
 	req.Header.Add("Authorization", "Client-ID "+client.ImgurClientID)
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	if client.MashapeKey != "" {
+		req.Header.Add("X-Mashape-Key", client.MashapeKey)
+	}
 
 	res, err := client.HTTPClient.Do(req)
 	if err != nil {

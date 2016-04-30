@@ -4,19 +4,13 @@ import (
 	"net/http"
 	"os"
 	"testing"
-
-	"github.com/koffeinsource/go-klogger"
 )
 
 func TestRateLimitImgurSimulated(t *testing.T) {
 	httpC, server := testHTTPClientJSON("{\"data\": { \"UserLimit\": 123, \"UserRemaining\": 456, \"UserReset\": 1460830093, \"ClientLimit\": 99, \"ClientRemaining\": 80 }, \"success\": true, \"status\": 200 }")
 	defer server.Close()
 
-	client := new(Client)
-	client.HTTPClient = httpC
-	client.Log = new(klogger.CLILogger)
-	client.ImgurClientID = "testing"
-
+	client := createClient(httpC, "testing", "")
 	rl, err := client.GetRateLimit()
 
 	if err != nil {
@@ -34,11 +28,9 @@ func TestRateLimitReal(t *testing.T) {
 	if key == "" {
 		t.Skip("IMGURCLIENTID environment variable not set.")
 	}
+	mashapKey := os.Getenv("MASHAPEKEY")
 
-	client := new(Client)
-	client.HTTPClient = new(http.Client)
-	client.Log = new(klogger.CLILogger)
-	client.ImgurClientID = key
+	client := createClient(new(http.Client), key, mashapKey)
 
 	rl, err := client.GetRateLimit()
 

@@ -6,12 +6,19 @@ import (
 	"net/http"
 )
 
+func (client *Client) createAPIURL(u string) string {
+	if client.MashapeKey == "" {
+		return apiEndpoint + u
+	}
+	return apiEndpointMashape + u
+}
+
 // getURL returns
 // - body as string
 // - RateLimit with current limits
 // - error in case something broke
 func (client *Client) getURL(URL string) (string, *RateLimit, error) {
-	URL = apiEndpoint + URL
+	URL = client.createAPIURL(URL)
 	client.Log.Infof("Requesting URL %v\n", URL)
 	req, err := http.NewRequest("GET", URL, nil)
 	if err != nil {
@@ -19,6 +26,9 @@ func (client *Client) getURL(URL string) (string, *RateLimit, error) {
 	}
 
 	req.Header.Add("Authorization", "Client-ID "+client.ImgurClientID)
+	if client.MashapeKey != "" {
+		req.Header.Add("X-Mashape-Key", client.MashapeKey)
+	}
 
 	// Make a request to the sourceURL
 	res, err := client.HTTPClient.Do(req)

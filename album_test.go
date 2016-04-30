@@ -4,19 +4,13 @@ import (
 	"net/http"
 	"os"
 	"testing"
-
-	"github.com/koffeinsource/go-klogger"
 )
 
 func TestAlbumImgurSimulated(t *testing.T) {
 	httpC, server := testHTTPClientJSON("{\"data\":{\"id\":\"VZQXk\",\"title\":\"Gianluca Gimini's bikes\",\"description\":null,\"datetime\":1460715031,\"cover\":\"CJCA0gW\",\"cover_width\":1200,\"cover_height\":786,\"account_url\":\"mrcassette\",\"account_id\":157430,\"privacy\":\"public\",\"layout\":\"blog\",\"views\":667581,\"link\":\"http:\\/\\/imgur.com\\/a\\/VZQXk\",\"favorite\":false,\"nsfw\":false,\"section\":\"pics\",\"images_count\":1,\"in_gallery\":true,\"images\":[{\"id\":\"CJCA0gW\",\"title\":null,\"description\":\"by Designer Gianluca Gimini\\nhttps:\\/\\/www.behance.net\\/gallery\\/35437979\\/Velocipedia\",\"datetime\":1460715032,\"type\":\"image\\/jpeg\",\"animated\":false,\"width\":1200,\"height\":786,\"size\":362373,\"views\":4420880,\"bandwidth\":1602007548240,\"vote\":null,\"favorite\":false,\"nsfw\":null,\"section\":null,\"account_url\":null,\"account_id\":null,\"in_gallery\":false,\"link\":\"http:\\/\\/i.imgur.com\\/CJCA0gW.jpg\"}]},\"success\":true,\"status\":200}")
 	defer server.Close()
 
-	client := new(Client)
-	client.HTTPClient = httpC
-	client.Log = new(klogger.CLILogger)
-	client.ImgurClientID = "testing"
-
+	client := createClient(httpC, "testing", "")
 	alb, status, err := client.GetAlbumInfo("VZQXk")
 
 	if err != nil {
@@ -38,11 +32,9 @@ func TestAlbumImgurReal(t *testing.T) {
 	if key == "" {
 		t.Skip("IMGURCLIENTID environment variable not set.")
 	}
+	mashapKey := os.Getenv("MASHAPEKEY")
 
-	client := new(Client)
-	client.HTTPClient = new(http.Client)
-	client.Log = new(klogger.CLILogger)
-	client.ImgurClientID = key
+	client := createClient(new(http.Client), key, mashapKey)
 
 	alb, status, err := client.GetAlbumInfo("VZQXk")
 

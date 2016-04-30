@@ -4,8 +4,6 @@ import (
 	"net/http"
 	"os"
 	"testing"
-
-	"github.com/koffeinsource/go-klogger"
 )
 
 const (
@@ -17,10 +15,7 @@ func TestUploadImageErrors(t *testing.T) {
 	httpC, server := testHTTPClientJSON("")
 	defer server.Close()
 
-	client := new(Client)
-	client.HTTPClient = httpC
-	client.Log = new(klogger.CLILogger)
-	client.ImgurClientID = "testing"
+	client := createClient(httpC, "testing", "")
 
 	// should fail because of nil image
 	ii, _, err := client.UploadImage(nil, "album", "type", "name", "desc")
@@ -50,11 +45,9 @@ func TestUploadImageReal(t *testing.T) {
 	if key == "" {
 		t.Skip("IMGURCLIENTID environment variable not set.")
 	}
+	mashapKey := os.Getenv("MASHAPEKEY")
 
-	client := new(Client)
-	client.HTTPClient = new(http.Client)
-	client.Log = new(klogger.CLILogger)
-	client.ImgurClientID = key
+	client := createClient(new(http.Client), key, mashapKey)
 
 	ii, status, err := client.UploadImageFromFile("test_data/testImage.jpg", "", title, descr)
 
@@ -76,11 +69,7 @@ func TestUploadImageSimulated(t *testing.T) {
 	httpC, server := testHTTPClientJSON("{\"data\":{\"id\":\"ClF8rLe\",\"title\":\"" + title + "\",\"description\":\"" + descr + "\",\"datetime\":1451248840,\"type\":\"image\\/jpeg\",\"animated\":false,\"width\":2448,\"height\":3264,\"size\":1071339,\"views\":176,\"bandwidth\":188555664,\"vote\":null,\"favorite\":false,\"nsfw\":null,\"section\":null,\"account_url\":null,\"account_id\":null,\"in_gallery\":false,\"link\":\"http:\\/\\/i.imgur.com\\/ClF8rLe.jpg\"},\"success\":true,\"status\":200}")
 	defer server.Close()
 
-	client := new(Client)
-	client.HTTPClient = httpC
-	client.Log = new(klogger.CLILogger)
-	client.ImgurClientID = "testing"
-
+	client := createClient(httpC, "testing", "")
 	ii, status, err := client.UploadImageFromFile("test_data/testImage.jpg", "ALBUMID", title, descr)
 
 	if err != nil || ii == nil {

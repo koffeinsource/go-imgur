@@ -11,4 +11,5 @@ type Client struct {
 	HTTPClient    *http.Client
 	Log           klogger.KLogger
 	ImgurClientID string
+	MashapeKey    string
 }

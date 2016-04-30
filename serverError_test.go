@@ -1,19 +1,12 @@
 package imgur
 
-import (
-	"testing"
-
-	"github.com/koffeinsource/go-klogger"
-)
+import "testing"
 
 func TestImgurNotSuccess(t *testing.T) {
 	httpC, server := testHTTPClientJSON("{\"data\": {}, \"success\": false, \"status\": 200 }")
 	defer server.Close()
 
-	client := new(Client)
-	client.HTTPClient = httpC
-	client.Log = new(klogger.CLILogger)
-	client.ImgurClientID = "testing"
+	client := createClient(httpC, "testing", "")
 
 	_, err := client.GetRateLimit()
 
@@ -63,10 +56,7 @@ func TestJsonError(t *testing.T) {
 	httpC, server := testHTTPClientInvalidJSON()
 	defer server.Close()
 
-	client := new(Client)
-	client.HTTPClient = httpC
-	client.Log = new(klogger.CLILogger)
-	client.ImgurClientID = "testing"
+	client := createClient(httpC, "testing", "")
 
 	rl, err := client.GetRateLimit()
 
@@ -117,10 +107,7 @@ func TestServerError(t *testing.T) {
 	httpC, server := testHTTPClient500()
 	defer server.Close()
 
-	client := new(Client)
-	client.HTTPClient = httpC
-	client.Log = new(klogger.CLILogger)
-	client.ImgurClientID = "testing"
+	client := createClient(httpC, "testing", "")
 
 	_, err := client.GetRateLimit()
 
@@ -170,11 +157,7 @@ func TestImgurError(t *testing.T) {
 	httpC, server := testHTTPClientJSON("{'data' : {}, 'success' : false, 'status'  : 500}")
 	defer server.Close()
 
-	client := new(Client)
-	client.HTTPClient = httpC
-	client.Log = new(klogger.CLILogger)
-	client.ImgurClientID = "testing"
-
+	client := createClient(httpC, "testing", "")
 	_, err := client.GetRateLimit()
 
 	if err == nil {
@@ -223,11 +206,7 @@ func TestServerDown(t *testing.T) {
 	httpC, server := testHTTPClient500()
 	server.Close()
 
-	client := new(Client)
-	client.HTTPClient = httpC
-	client.Log = new(klogger.CLILogger)
-	client.ImgurClientID = "testing"
-
+	client := createClient(httpC, "testing", "")
 	_, err := client.GetRateLimit()
 
 	if err == nil {
