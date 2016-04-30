@@ -57,7 +57,7 @@ func (client *Client) UploadImage(image []byte, album string, dtype string, titl
 	dec := json.NewDecoder(bytes.NewReader(body))
 	var img imageInfoDataWrapper
 	if err = dec.Decode(&img); err != nil {
-		return nil, -1, errors.New("Problem decoding json result from image upload - " + err.Error())
+		return nil, -1, errors.New("Problem decoding json result from image upload - " + err.Error() + ". JSON(?): " + string(body))
 	}
 
 	if !img.Success {
