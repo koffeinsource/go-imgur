@@ -54,7 +54,7 @@ func (client *Client) directImageURL(url string) (*GenericInfo, int, error) {
 	id := url[start:end]
 	client.Log.Debugf("Detected imgur image ID %v. Was going down the i.imgur.com/ path.", id)
 	gii, status, err := client.GetGalleryImageInfo(id)
-	if status < 400 {
+	if err == nil && status < 400 {
 		ret.GImage = gii
 	} else {
 		var ii *ImageInfo
