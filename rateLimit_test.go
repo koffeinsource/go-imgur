@@ -25,14 +25,14 @@ func TestRateLimitImgurSimulated(t *testing.T) {
 	}
 }
 
-func TestRateLimitRealMashap(t *testing.T) {
+func TestRateLimitRealRapidAPI(t *testing.T) {
 	key := os.Getenv("IMGURCLIENTID")
 	if key == "" {
 		t.Skip("IMGURCLIENTID environment variable not set.")
 	}
-	mashapKey := os.Getenv("MASHAPEKEY")
+	RapidAPIKey := os.Getenv("RapidAPIKEY")
 
-	client := createClient(new(http.Client), key, mashapKey)
+	client := createClient(new(http.Client), key, RapidAPIKey)
 
 	rl, err := client.GetRateLimit()
 

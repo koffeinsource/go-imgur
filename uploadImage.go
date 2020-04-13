@@ -39,8 +39,8 @@ func (client *Client) UploadImage(image []byte, album string, dtype string, titl
 
 	req.Header.Add("Authorization", "Client-ID "+client.ImgurClientID)
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-	if client.MashapeKey != "" {
-		req.Header.Add("X-Mashape-Key", client.MashapeKey)
+	if client.RapidAPIKEY != "" {
+		req.Header.Add("X-RapidAPI-Key", client.RapidAPIKEY)
 	}
 
 	res, err := client.HTTPClient.Do(req)

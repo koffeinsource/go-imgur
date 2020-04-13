@@ -35,5 +35,5 @@ jobs:
     - name: Test
       env:
          IMGURCLIENTID: ${{ secrets. IMGURCLIENTID }}
-         MASHAPEKEY: ${{ secrets.  MASHAPEKEY }}
+         RapidAPIKEY: ${{ secrets.  RapidAPIKEY }}
       run: go test

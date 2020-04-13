@@ -45,9 +45,9 @@ func TestUploadImageReal(t *testing.T) {
 	if key == "" {
 		t.Skip("IMGURCLIENTID environment variable not set.")
 	}
-	mashapKey := os.Getenv("MASHAPEKEY")
+	RapidAPIKey := os.Getenv("RapidAPIKEY")
 
-	client := createClient(new(http.Client), key, mashapKey)
+	client := createClient(new(http.Client), key, RapidAPIKey)
 
 	ii, status, err := client.UploadImageFromFile("test_data/testImage.jpg", "", title, descr)
 

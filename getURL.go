@@ -7,10 +7,10 @@ import (
 )
 
 func (client *Client) createAPIURL(u string) string {
-	if client.MashapeKey == "" {
+	if client.RapidAPIKEY == "" {
 		return apiEndpoint + u
 	}
-	return apiEndpointMashape + u
+	return apiEndpointRapidAPI + u
 }
 
 // getURL returns
@@ -26,9 +26,9 @@ func (client *Client) getURL(URL string) (string, *RateLimit, error) {
 	}
 
 	req.Header.Add("Authorization", "Client-ID "+client.ImgurClientID)
-	if client.MashapeKey != "" {
+	if client.RapidAPIKEY != "" {
 		req.Header.Add("x-rapidapi-host", "imgur-apiv3.p.rapidapi.com")
-		req.Header.Add("x-rapidapi-key", client.MashapeKey)
+		req.Header.Add("x-rapidapi-key", client.RapidAPIKEY)
 	}
 
 	// Make a request to the sourceURL

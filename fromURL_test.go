@@ -41,9 +41,9 @@ func TestGetFromURLAlbumReal(t *testing.T) {
 	if key == "" {
 		t.Skip("IMGURCLIENTID environment variable not set.")
 	}
-	mashapKey := os.Getenv("MASHAPEKEY")
+	RapidAPIKey := os.Getenv("RapidAPIKEY")
 
-	client := createClient(new(http.Client), key, mashapKey)
+	client := createClient(new(http.Client), key, RapidAPIKey)
 
 	ge, status, err := client.GetInfoFromURL("https://imgur.com/a/VZQXk")
 
@@ -127,9 +127,9 @@ func TestGetFromURLGAlbumReal(t *testing.T) {
 	if key == "" {
 		t.Skip("IMGURCLIENTID environment variable not set.")
 	}
-	mashapKey := os.Getenv("MASHAPEKEY")
+	RapidAPIKey := os.Getenv("RapidAPIKEY")
 
-	client := createClient(new(http.Client), key, mashapKey)
+	client := createClient(new(http.Client), key, RapidAPIKey)
 
 	ge, status, err := client.GetInfoFromURL("https://imgur.com/gallery/VZQXk")
 
@@ -191,9 +191,9 @@ func TestGetURLGalleryImageReal(t *testing.T) {
 	if key == "" {
 		t.Skip("IMGURCLIENTID environment variable not set.")
 	}
-	mashapKey := os.Getenv("MASHAPEKEY")
+	RapidAPIKey := os.Getenv("RapidAPIKEY")
 
-	client := createClient(new(http.Client), key, mashapKey)
+	client := createClient(new(http.Client), key, RapidAPIKey)
 
 	ge, status, err := client.GetInfoFromURL("https://imgur.com/gallery/uPI76jY")
 
@@ -269,9 +269,9 @@ func TestGetURLImageReal(t *testing.T) {
 	if key == "" {
 		t.Skip("IMGURCLIENTID environment variable not set.")
 	}
-	mashapKey := os.Getenv("MASHAPEKEY")
+	RapidAPIKey := os.Getenv("RapidAPIKEY")
 
-	client := createClient(new(http.Client), key, mashapKey)
+	client := createClient(new(http.Client), key, RapidAPIKey)
 
 	ge, status, err := client.GetInfoFromURL("https://imgur.com/ClF8rLe")
 
@@ -370,9 +370,9 @@ func TestGetURLDirectImageReal(t *testing.T) {
 	if key == "" {
 		t.Skip("IMGURCLIENTID environment variable not set.")
 	}
-	mashapKey := os.Getenv("MASHAPEKEY")
+	RapidAPIKey := os.Getenv("RapidAPIKEY")
 
-	client := createClient(new(http.Client), key, mashapKey)
+	client := createClient(new(http.Client), key, RapidAPIKey)
 
 	ge, status, err := client.GetInfoFromURL("https://i.imgur.com/ClF8rLe.jpg")
 
