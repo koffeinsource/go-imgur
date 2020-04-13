@@ -75,32 +75,31 @@ func extractRateLimits(h http.Header) (rl *RateLimit, err error) {
 
 // GetRateLimit returns the current rate limit without doing anything else
 func (client *Client) GetRateLimit() (*RateLimit, error) {
-	// the strange thing here is, that imgur does not add the ratelimit http headers
-	// on the credits endpoint. So we must parse the json and ignore the ratelimit
-	// returned from getURL
-	body, _, err := client.getURL("credits")
+	// We are requesting any URL and parse the returned HTTP headers
+	body, rl, err := client.getURL("account/kaffeeshare")
 
 	if err != nil {
 		return nil, errors.New("Problem getting URL for rate - " + err.Error())
 	}
-	// client.Log.Debugf("%v\n", body)
+	//client.Log.Debugf("%v\n", body)
 
 	dec := json.NewDecoder(strings.NewReader(body))
-	var rl rateLimitDataWrapper
-	if err := dec.Decode(&rl); err != nil {
+
+	var bodyDecoded rateLimitDataWrapper
+	if err := dec.Decode(&bodyDecoded); err != nil {
 		return nil, errors.New("Problem decoding json for ratelimit - " + err.Error())
 	}
 
-	if !rl.Success {
-		return nil, errors.New("Request to imgur failed for ratelimit - " + strconv.Itoa(rl.Status))
+	if !bodyDecoded.Success {
+		return nil, errors.New("Request to imgur failed for ratelimit - " + strconv.Itoa(bodyDecoded.Status))
 	}
 
 	var ret RateLimit
-	ret.ClientLimit = rl.Rl.ClientLimit
-	ret.ClientRemaining = rl.Rl.ClientRemaining
-	ret.UserLimit = rl.Rl.UserLimit
-	ret.UserRemaining = rl.Rl.UserRemaining
-	ret.UserReset = time.Unix(rl.Rl.UserReset, 0)
+	ret.ClientLimit = rl.ClientLimit
+	ret.ClientRemaining = rl.ClientRemaining
+	ret.UserLimit = rl.UserLimit
+	ret.UserRemaining = rl.UserRemaining
+	ret.UserReset = rl.UserReset
 
 	return &ret, nil
 }

@@ -58,12 +58,6 @@ func TestJsonError(t *testing.T) {
 
 	client := createClient(httpC, "testing", "")
 
-	rl, err := client.GetRateLimit()
-
-	if err == nil || rl != nil {
-		t.Error("GetRateLimit() should have failed, but didn't")
-	}
-
 	img, _, err := client.GetImageInfo("asd")
 
 	if err == nil || img != nil {
