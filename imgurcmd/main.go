@@ -81,7 +81,7 @@ func main() {
 	flag.Parse()
 
 	// Check if there is anything todo
-	if flag.NFlag() >= 2 || *imgurClientID == "" {
+	if flag.NFlag() >= 3 || *imgurClientID == "" {
 		flag.PrintDefaults()
 		return
 	}
