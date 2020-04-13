@@ -19,10 +19,34 @@ func TestAlbumImgurSimulated(t *testing.T) {
 	}
 
 	if alb.Title != "Gianluca Gimini's bikes" || alb.Cover != "CJCA0gW" || alb.CoverWidth != 1200 || alb.CoverHeight != 786 || alb.Link != "https://imgur.com/a/VZQXk" || alb.ImagesCount != 1 || alb.Images[0].ID != "CJCA0gW" {
+		t.Error("Data comparision failed.")
+
+		if alb.Title != "Gianluca Gimini's bikes" {
+			t.Errorf("Title is %v.\n", alb.Title)
+		}
+		if alb.Cover != "CJCA0gW" {
+			t.Errorf("Cover is %v.\n", alb.Cover)
+		}
+		if alb.CoverWidth != 1200 {
+			t.Errorf("CoverWidth is %v.\n", alb.CoverWidth)
+		}
+		if alb.CoverHeight != 786 {
+			t.Errorf("CoverHeight is %v.\n", alb.CoverHeight)
+		}
+		if alb.Link != "https://imgur.com/a/VZQXk" {
+			t.Errorf("Link is %v.\n", alb.Link)
+		}
+		if alb.ImagesCount != 14 {
+			t.Errorf("ImagesCount is %v.\n", alb.ImagesCount)
+		}
+		if alb.Images[0].ID != "CJCA0gW" {
+			t.Errorf("Images is %v.\n", alb.Images)
+		}
 		t.Fail()
 	}
 
 	if status != 200 {
+		t.Errorf("Statsu != 200. It was %v.", status)
 		t.Fail()
 	}
 }
@@ -44,33 +68,34 @@ func TestAlbumImgurReal(t *testing.T) {
 	}
 
 	if alb.Title != "Gianluca Gimini's bikes" || alb.Cover != "CJCA0gW" || alb.CoverWidth != 1200 || alb.CoverHeight != 786 || alb.Link != "https://imgur.com/a/VZQXk" || alb.ImagesCount != 14 || alb.Images[0].ID != "CJCA0gW" {
+		t.Error("Data comparision failed.")
 
 		if alb.Title != "Gianluca Gimini's bikes" {
-			client.Log.Debugf("alb.Title: %v\n", alb.Title)
+			t.Errorf("Title is %v.\n", alb.Title)
 		}
 		if alb.Cover != "CJCA0gW" {
-			client.Log.Debugf("alb.Cover: %v\n", alb.Cover)
+			t.Errorf("Cover is %v.\n", alb.Cover)
 		}
 		if alb.CoverWidth != 1200 {
-			client.Log.Debugf("alb.CoverWidth: %v\n", alb.CoverWidth)
+			t.Errorf("CoverWidth is %v.\n", alb.CoverWidth)
 		}
 		if alb.CoverHeight != 786 {
-			client.Log.Debugf("alb.CoverHeight: %v\n", alb.CoverHeight)
+			t.Errorf("CoverHeight is %v.\n", alb.CoverHeight)
 		}
 		if alb.Link != "https://imgur.com/a/VZQXk" {
-			client.Log.Debugf("alb.Link: %v\n", alb.Link)
+			t.Errorf("Link is %v.\n", alb.Link)
 		}
 		if alb.ImagesCount != 14 {
-			client.Log.Debugf("alb.ImagesCount: %v\n", alb.ImagesCount)
+			t.Errorf("ImagesCount is %v.\n", alb.ImagesCount)
 		}
 		if alb.Images[0].ID != "CJCA0gW" {
-			client.Log.Debugf("alb.Images[0].ID: %v\n", alb.Images[0].ID)
+			t.Errorf("Images is %v.\n", alb.Images)
 		}
-
 		t.Fail()
 	}
 
 	if status != 200 {
+		t.Errorf("Statsu != 200. It was %v.", status)
 		t.Fail()
 	}
 }
