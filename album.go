@@ -66,17 +66,18 @@ func (client *Client) GetAlbumInfo(id string) (*AlbumInfo, int, error) {
 	if err != nil {
 		return nil, -1, errors.New("Problem getting URL for album info ID " + id + " - " + err.Error())
 	}
-	// client.Log.Debugf("%v\n", body)
+	//client.Log.Debugf("%v\n", body)
 
 	dec := json.NewDecoder(strings.NewReader(body))
 	var alb albumInfoDataWrapper
 	if err := dec.Decode(&alb); err != nil {
 		return nil, -1, errors.New("Problem decoding json for albumID " + id + " - " + err.Error())
 	}
-	alb.Ai.Limit = rl
 
 	if !alb.Success {
 		return nil, alb.Status, errors.New("Request to imgur failed for albumID " + id + " - " + strconv.Itoa(alb.Status))
 	}
+
+	alb.Ai.Limit = rl
 	return alb.Ai, alb.Status, nil
 }
