@@ -22,7 +22,7 @@ import (
 // returns image info, status code of the upload, error
 func (client *Client) UploadImage(image []byte, album string, dtype string, title string, description string) (*ImageInfo, int, error) {
 	if image == nil {
-		return nil, -1, errors.New("Invalid image.")
+		return nil, -1, errors.New("Invalid image")
 	}
 	if dtype != "file" && dtype != "base64" && dtype != "URL" {
 		return nil, -1, errors.New("Passed invalid dtype: " + dtype + ". Please use file/base64/URL.")
