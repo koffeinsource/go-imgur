@@ -33,4 +33,7 @@ jobs:
       run: go build -v .
     
     - name: Test
+      env:
+         IMGURCLIENTID: ${{ secrets. IMGURCLIENTID }}
+         MASHAPEKEY: ${{ secrets.  MASHAPEKEY }}
       run: go test
