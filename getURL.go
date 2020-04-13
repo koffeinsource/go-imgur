@@ -27,7 +27,8 @@ func (client *Client) getURL(URL string) (string, *RateLimit, error) {
 
 	req.Header.Add("Authorization", "Client-ID "+client.ImgurClientID)
 	if client.MashapeKey != "" {
-		req.Header.Add("X-Mashape-Key", client.MashapeKey)
+		req.Header.Add("x-rapidapi-host", "imgur-apiv3.p.rapidapi.com")
+		req.Header.Add("x-rapidapi-key", client.MashapeKey)
 	}
 
 	// Make a request to the sourceURL
@@ -36,6 +37,10 @@ func (client *Client) getURL(URL string) (string, *RateLimit, error) {
 		return "", nil, errors.New("Could not get " + URL + " - " + err.Error())
 	}
 	defer res.Body.Close()
+
+	if !(res.StatusCode >= 200 && res.StatusCode <= 300) {
+		return "", nil, errors.New("HTTP status indicates an error for " + URL + " - " + res.Status)
+	}
 
 	// Read the whole body
 	body, err := ioutil.ReadAll(res.Body)
