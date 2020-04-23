@@ -100,7 +100,7 @@ func (client *Client) galleryURL(url string) (*GenericInfo, int, error) {
 		return &ret, status, err
 	}
 	// fallback to GetGalleryImageInfo
-	client.Log.Debugf("Failed to retrieve imgur gallery album. Attempting to retrieve imgur gallery image")
+	client.Log.Debugf("Failed to retrieve imgur gallery album. Attempting to retrieve imgur gallery image. err: %v status: %d", err, status)
 	ii, status, err := client.GetGalleryImageInfo(id)
 	ret.GImage = ii
 	return &ret, status, err
