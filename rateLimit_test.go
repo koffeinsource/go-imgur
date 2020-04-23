@@ -31,6 +31,9 @@ func TestRateLimitRealRapidAPI(t *testing.T) {
 		t.Skip("IMGURCLIENTID environment variable not set.")
 	}
 	RapidAPIKey := os.Getenv("RapidAPIKEY")
+	if RapidAPIKey == "" {
+		t.Skip("RapidAPIKEY environment variable not set.")
+	}
 
 	client := createClient(new(http.Client), key, RapidAPIKey)
 
@@ -44,7 +47,7 @@ func TestRateLimitRealRapidAPI(t *testing.T) {
 	// There seem to be not rate limites when using the payed API
 	if rl.ClientLimit != 0 || rl.UserLimit != 0 {
 		client.Log.Debugf("Found ClientLimit: %v and UserLimit: %v", rl.ClientLimit, rl.UserLimit)
-		t.Error("Client/User limits are wrong. Probably something broken. Or IMGUR changed their limits. Or you are not using a free account for testing. Sorry. No real good way to test this.")
+		t.Error("Client/User limits are wrong. Probably something broken. Or IMGUR changed their limits. Or you are using a free account for testing. Sorry. No real good way to test this.")
 	}
 }
 
