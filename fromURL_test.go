@@ -131,26 +131,77 @@ func TestGetFromURLGAlbumReal(t *testing.T) {
 
 	client := createClient(new(http.Client), key, RapidAPIKey)
 
-	ge, status, err := client.GetInfoFromURL("https://imgur.com/gallery/VZQXk")
-
-	if err != nil {
-		t.Errorf("GetInfoFromURL() failed with error: %v", err)
-		t.FailNow()
+	tests := []struct {
+		galleryURL string
+		expected   map[string]interface{}
+	}{
+		{
+			galleryURL: "https://imgur.com/gallery/VZQXk",
+			expected: map[string]interface{}{
+				"title":        "As it turns out, most people cannot draw a bike.",
+				"cover":        "CJCA0gW",
+				"coverWidth":   1200,
+				"coverHeight":  786,
+				"link":         "https://imgur.com/a/VZQXk",
+				"imagesCount":  14,
+				"firstImageID": "CJCA0gW",
+			},
+		},
+		{
+			galleryURL: "https://imgur.com/gallery/t6l1GiW",
+			expected: map[string]interface{}{
+				"title":        "Funny Random Meme and Twitter Dump",
+				"cover":        "60wTouU",
+				"coverWidth":   1242,
+				"coverHeight":  1512,
+				"link":         "https://imgur.com/a/t6l1GiW",
+				"imagesCount":  50,
+				"firstImageID": "60wTouU",
+			},
+		},
 	}
-
-	if ge.Album != nil || ge.GAlbum == nil || ge.GImage != nil || ge.Image != nil {
-		t.Error("GetInfoFromURL() failed. Returned wrong type.")
-		t.FailNow()
-	}
-
-	alb := ge.GAlbum
-
-	if alb.Title != "As it turns out, most people cannot draw a bike." || alb.Cover != "CJCA0gW" || alb.CoverWidth != 1200 || alb.CoverHeight != 786 || alb.Link != "https://imgur.com/a/VZQXk" || alb.ImagesCount != 14 || alb.Images[0].ID != "CJCA0gW" {
-		t.Fail()
-	}
-
-	if status != 200 {
-		t.Fail()
+	for _, test := range tests {
+		ge, status, err := client.GetInfoFromURL(test.galleryURL)
+		if err != nil {
+			t.Errorf("GetInfoFromURL() failed with error: %v", err)
+			t.FailNow()
+		}
+		if ge.Album != nil || ge.GAlbum == nil || ge.GImage != nil || ge.Image != nil {
+			t.Error("GetInfoFromURL() failed. Returned wrong type.")
+			t.FailNow()
+		}
+		if ge.GAlbum.Title != test.expected["title"] {
+			t.Errorf("title mismatch: %s != %s", ge.GAlbum.Title, test.expected["title"])
+			t.Fail()
+		}
+		if ge.GAlbum.Cover != test.expected["cover"] {
+			t.Errorf("cover mismatch: %s != %s", ge.GAlbum.Cover, test.expected["cover"])
+			t.Fail()
+		}
+		if ge.GAlbum.CoverWidth != test.expected["coverWidth"] {
+			t.Errorf("coverWidth mismatch: %d != %d", ge.GAlbum.CoverWidth, test.expected["coverWidth"])
+			t.Fail()
+		}
+		if ge.GAlbum.CoverHeight != test.expected["coverHeight"] {
+			t.Errorf("coverHeight mismatch: %d != %d", ge.GAlbum.CoverHeight, test.expected["coverHeight"])
+			t.Fail()
+		}
+		if ge.GAlbum.Link != test.expected["link"] {
+			t.Errorf("link mismatch: %s != %s", ge.GAlbum.Link, test.expected["link"])
+			t.Fail()
+		}
+		if ge.GAlbum.ImagesCount != test.expected["imagesCount"] {
+			t.Errorf("imagesCount mismatch: %d != %d", ge.GAlbum.ImagesCount, test.expected["imagesCount"])
+			t.Fail()
+		}
+		if ge.GAlbum.Images[0].ID != test.expected["firstImageID"] {
+			t.Errorf("firstImageID mismatch: %s != %s", ge.GAlbum.Images[0].ID, test.expected["firstImageID"])
+			t.Fail()
+		}
+		if status != http.StatusOK {
+			t.Errorf("status mismatch: %d != %d", status, http.StatusOK)
+			t.Fail()
+		}
 	}
 }
 

@@ -30,8 +30,7 @@ func (client *Client) GetInfoFromURL(url string) (*GenericInfo, int, error) {
 		return client.albumURL(url)
 	}
 
-	// https://imgur.com/gallery/<id> len(id) == 5 -> gallery album
-	// https://imgur.com/gallery/<id> len(id) == 7 -> gallery image
+	// https://imgur.com/gallery/<id> -> gallery album
 	if strings.Contains(url, "://imgur.com/gallery/") || strings.Contains(url, "://m.imgur.com/gallery/") {
 		return client.galleryURL(url)
 	}
@@ -95,13 +94,13 @@ func (client *Client) galleryURL(url string) (*GenericInfo, int, error) {
 		return nil, -1, errors.New("Could not find ID in URL " + url + ". I was going down imgur.com/gallery/ path.")
 	}
 	client.Log.Debugf("Detected imgur gallery ID %v. Was going down the imgur.com/gallery/ path.", id)
-	if len(id) == 5 {
-		client.Log.Debugf("Detected imgur gallery album.")
-		ai, status, err := client.GetGalleryAlbumInfo(id)
+	ai, status, err := client.GetGalleryAlbumInfo(id)
+	if err == nil && status < 400 {
 		ret.GAlbum = ai
 		return &ret, status, err
 	}
-
+	// fallback to GetGalleryImageInfo
+	client.Log.Debugf("Failed to retrieve imgur gallery album. Attempting to retrieve imgur gallery image")
 	ii, status, err := client.GetGalleryImageInfo(id)
 	ret.GImage = ii
 	return &ret, status, err
