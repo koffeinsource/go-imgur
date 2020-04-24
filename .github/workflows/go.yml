@@ -27,8 +27,8 @@ jobs:
         
       - name: Test
         env:
-         IMGURCLIENTID: ${{ secrets. IMGURCLIENTID }}
-         RapidAPIKEY: ${{ secrets.  RapidAPIKEY }}
+          IMGURCLIENTID: ${{ secrets. IMGURCLIENTID }}
+          RapidAPIKEY: ${{ secrets.  RapidAPIKEY }}
         run: go test -v -coverprofile=profile.cov ./...
 
       - name: Send Coverage
