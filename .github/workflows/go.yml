@@ -21,14 +21,17 @@ jobs:
           go-version: ${{ matrix.go }}
       
       - uses: actions/checkout@v2
+      
+      - name: Build
+        run: go build -v .
         
-      - name: go test
+      - name: Test
         env:
          IMGURCLIENTID: ${{ secrets. IMGURCLIENTID }}
          RapidAPIKEY: ${{ secrets.  RapidAPIKEY }}
         run: go test -v -coverprofile=profile.cov ./...
 
-      - name: Send coverage
+      - name: Send Coverage
         uses: shogo82148/actions-goveralls@v1
         with:
           path-to-profile: profile.cov
