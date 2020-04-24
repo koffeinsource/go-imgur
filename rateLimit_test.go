@@ -44,7 +44,7 @@ func TestRateLimitRealRapidAPI(t *testing.T) {
 		t.FailNow()
 	}
 
-	// There seem to be not rate limites when using the payed API
+	// There seem to be not rate limites when using the paid API
 	if rl.ClientLimit != 0 || rl.UserLimit != 0 {
 		client.Log.Debugf("Found ClientLimit: %v and UserLimit: %v", rl.ClientLimit, rl.UserLimit)
 		t.Error("Client/User limits are wrong. Probably something broken. Or IMGUR changed their limits. Or you are using a free account for testing. Sorry. No real good way to test this.")

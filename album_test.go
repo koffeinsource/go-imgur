@@ -19,7 +19,7 @@ func TestAlbumImgurSimulated(t *testing.T) {
 	}
 
 	if alb.Title != "Gianluca Gimini's bikes" || alb.Cover != "CJCA0gW" || alb.CoverWidth != 1200 || alb.CoverHeight != 786 || alb.Link != "https://imgur.com/a/VZQXk" || alb.ImagesCount != 1 || alb.Images[0].ID != "CJCA0gW" {
-		t.Error("Data comparision failed.")
+		t.Error("Data comparison failed.")
 
 		if alb.Title != "Gianluca Gimini's bikes" {
 			t.Errorf("Title is %v.\n", alb.Title)
@@ -68,7 +68,7 @@ func TestAlbumImgurReal(t *testing.T) {
 	}
 
 	if alb.Title != "Gianluca Gimini's bikes" || alb.Cover != "CJCA0gW" || alb.CoverWidth != 1200 || alb.CoverHeight != 786 || alb.Link != "https://imgur.com/a/VZQXk" || alb.ImagesCount != 14 || alb.Images[0].ID != "CJCA0gW" {
-		t.Error("Data comparision failed.")
+		t.Error("Data comparison failed.")
 
 		if alb.Title != "Gianluca Gimini's bikes" {
 			t.Errorf("Title is %v.\n", alb.Title)
