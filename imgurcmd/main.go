@@ -66,7 +66,10 @@ func printURL(client *imgur.Client, url *string) {
 		client.Log.Errorf("Error in GetInfoFromURL: %v\n", err)
 		return
 	}
-	client.Log.Infof("%v\n", img)
+	client.Log.Infof("Image: %+v\n", img.Image)
+	client.Log.Infof("Album: %+v\n", img.Album)
+	client.Log.Infof("GImage: %+v\n", img.GImage)
+	client.Log.Infof("GAlbum: %+v\n", img.GAlbum)
 }
 
 func main() {
