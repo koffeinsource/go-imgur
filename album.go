@@ -46,7 +46,7 @@ type AlbumInfo struct {
 	// Indicates if the image has been marked as nsfw or not. Defaults to null if information is not available.
 	Nsfw bool `json:"nsfw"`
 	// If the image has been categorized by our backend then this will contain the section the image belongs in. (funny, cats, adviceanimals, wtf, etc)
-	Section string `json:"secion"`
+	Section string `json:"section"`
 	// Order number of the album on the user's album page (defaults to 0 if their albums haven't been reordered)
 	Order int `json:"order"`
 	// OPTIONAL, the deletehash, if you're logged in as the album owner
