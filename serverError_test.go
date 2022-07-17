@@ -6,7 +6,7 @@ func TestImgurNotSuccess(t *testing.T) {
 	httpC, server := testHTTPClientJSON("{\"data\": {}, \"success\": false, \"status\": 200 }")
 	defer server.Close()
 
-	client := createClient(httpC, "testing", "")
+	client, _ := NewClient(httpC, "testing", "")
 
 	_, err := client.GetRateLimit()
 
@@ -56,7 +56,7 @@ func TestJsonError(t *testing.T) {
 	httpC, server := testHTTPClientInvalidJSON()
 	defer server.Close()
 
-	client := createClient(httpC, "testing", "")
+	client, _ := NewClient(httpC, "testing", "")
 
 	img, _, err := client.GetImageInfo("asd")
 
@@ -101,7 +101,7 @@ func TestServerError(t *testing.T) {
 	httpC, server := testHTTPClient500()
 	defer server.Close()
 
-	client := createClient(httpC, "testing", "")
+	client, _ := NewClient(httpC, "testing", "")
 
 	_, err := client.GetRateLimit()
 
@@ -151,7 +151,7 @@ func TestImgurError(t *testing.T) {
 	httpC, server := testHTTPClientJSON("{'data' : {}, 'success' : false, 'status'  : 500}")
 	defer server.Close()
 
-	client := createClient(httpC, "testing", "")
+	client, _ := NewClient(httpC, "testing", "")
 	_, err := client.GetRateLimit()
 
 	if err == nil {
@@ -200,7 +200,7 @@ func TestServerDown(t *testing.T) {
 	httpC, server := testHTTPClient500()
 	server.Close()
 
-	client := createClient(httpC, "testing", "")
+	client, _ := NewClient(httpC, "testing", "")
 	_, err := client.GetRateLimit()
 
 	if err == nil {

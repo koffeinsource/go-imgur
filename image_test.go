@@ -10,7 +10,7 @@ func TestImageImgurSimulated(t *testing.T) {
 	httpC, server := testHTTPClientJSON("{\"data\":{\"id\":\"ClF8rLe\",\"title\":null,\"description\":null,\"datetime\":1451248840,\"type\":\"image\\/jpeg\",\"animated\":false,\"width\":2448,\"height\":3264,\"size\":1071339,\"views\":176,\"bandwidth\":188555664,\"vote\":null,\"favorite\":false,\"nsfw\":null,\"section\":null,\"account_url\":null,\"account_id\":null,\"in_gallery\":false,\"link\":\"https:\\/\\/i.imgur.com\\/ClF8rLe.jpg\"},\"success\":true,\"status\":200}")
 	defer server.Close()
 
-	client := createClient(httpC, "testing", "")
+	client, _ := NewClient(httpC, "testing", "")
 	img, status, err := client.GetImageInfo("ClF8rLe")
 
 	if err != nil {
@@ -34,7 +34,7 @@ func TestImageImgurReal(t *testing.T) {
 	}
 	RapidAPIKey := os.Getenv("RapidAPIKEY")
 
-	client := createClient(new(http.Client), key, RapidAPIKey)
+	client, _ := NewClient(new(http.Client), key, RapidAPIKey)
 
 	img, status, err := client.GetImageInfo("ClF8rLe")
 

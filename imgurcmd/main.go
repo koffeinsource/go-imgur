@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/koffeinsource/go-imgur"
-	"github.com/koffeinsource/go-klogger"
 )
 
 func printRate(client *imgur.Client) {
@@ -89,10 +88,11 @@ func main() {
 		return
 	}
 
-	client := new(imgur.Client)
-	client.HTTPClient = new(http.Client)
-	client.Log = new(klogger.CLILogger)
-	client.ImgurClientID = *imgurClientID
+	client, err := imgur.NewClient(new(http.Client), *imgurClientID, "")
+	if err != nil {
+		fmt.Printf("failed during imgur client creation. %+v\n", err)
+		return
+	}
 
 	if *upload != "" {
 		_, st, err := client.UploadImageFromFile(*upload, "", "test title", "test desc")

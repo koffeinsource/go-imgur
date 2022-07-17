@@ -12,7 +12,7 @@ func TestGetFromURLAlbumSimulated(t *testing.T) {
 	httpC, server := testHTTPClientJSON("{\"data\":{\"id\":\"VZQXk\",\"title\":\"Gianluca Gimini's bikes\",\"description\":null,\"datetime\":1460715031,\"cover\":\"CJCA0gW\",\"cover_width\":1200,\"cover_height\":786,\"account_url\":\"mrcassette\",\"account_id\":157430,\"privacy\":\"public\",\"layout\":\"blog\",\"views\":667581,\"link\":\"https:\\/\\/imgur.com\\/a\\/VZQXk\",\"favorite\":false,\"nsfw\":false,\"section\":\"pics\",\"images_count\":1,\"in_gallery\":true,\"images\":[{\"id\":\"CJCA0gW\",\"title\":null,\"description\":\"by Designer Gianluca Gimini\\nhttps:\\/\\/www.behance.net\\/gallery\\/35437979\\/Velocipedia\",\"datetime\":1460715032,\"type\":\"image\\/jpeg\",\"animated\":false,\"width\":1200,\"height\":786,\"size\":362373,\"views\":4420880,\"bandwidth\":1602007548240,\"vote\":null,\"favorite\":false,\"nsfw\":null,\"section\":null,\"account_url\":null,\"account_id\":null,\"in_gallery\":false,\"link\":\"https:\\/\\/i.imgur.com\\/CJCA0gW.jpg\"}]},\"success\":true,\"status\":200}")
 	defer server.Close()
 
-	client := createClient(httpC, "testing", "")
+	client, _ := NewClient(httpC, "testing", "")
 	ge, status, err := client.GetInfoFromURL("https://imgur.com/a/VZQXk")
 
 	if err != nil {
@@ -43,7 +43,7 @@ func TestGetFromURLAlbumReal(t *testing.T) {
 	}
 	RapidAPIKey := os.Getenv("RapidAPIKEY")
 
-	client := createClient(new(http.Client), key, RapidAPIKey)
+	client, _ := NewClient(new(http.Client), key, RapidAPIKey)
 
 	ge, status, err := client.GetInfoFromURL("https://imgur.com/a/VZQXk")
 
@@ -71,7 +71,7 @@ func TestGetFromURLAlbumReal(t *testing.T) {
 func TestGetFromURLAlbumNoID(t *testing.T) {
 	httpC, server := testHTTPClient500()
 	defer server.Close()
-	client := createClient(httpC, "testing", "")
+	client, _ := NewClient(httpC, "testing", "")
 
 	_, _, err := client.GetInfoFromURL("https://imgur.com/a/")
 
@@ -84,7 +84,7 @@ func TestGetFromURLAlbumNoID(t *testing.T) {
 func TestGetFromURLGalleryNoID(t *testing.T) {
 	httpC, server := testHTTPClient500()
 	defer server.Close()
-	client := createClient(httpC, "testing", "")
+	client, _ := NewClient(httpC, "testing", "")
 
 	_, _, err := client.GetInfoFromURL("https://imgur.com/gallery/")
 
@@ -98,7 +98,7 @@ func TestGetFromURLGAlbumSimulated(t *testing.T) {
 	httpC, server := testHTTPClientJSON("{\"data\":{\"id\":\"VZQXk\",\"title\":\"As it turns out, most people cannot draw a bike.\",\"description\":null,\"datetime\":1460715031,\"cover\":\"CJCA0gW\",\"cover_width\":1200,\"cover_height\":786,\"account_url\":\"mrcassette\",\"account_id\":157430,\"privacy\":\"public\",\"layout\":\"blog\",\"views\":667581,\"link\":\"https:\\/\\/imgur.com\\/a\\/VZQXk\",\"ups\":13704,\"downs\":113,\"favorite\":false,\"nsfw\":false,\"section\":\"pics\",\"images_count\":1,\"in_gallery\":true,\"images\":[{\"id\":\"CJCA0gW\",\"title\":null,\"description\":\"by Designer Gianluca Gimini\\nhttps:\\/\\/www.behance.net\\/gallery\\/35437979\\/Velocipedia\",\"datetime\":1460715032,\"type\":\"image\\/jpeg\",\"animated\":false,\"width\":1200,\"height\":786,\"size\":362373,\"views\":4420880,\"bandwidth\":1602007548240,\"vote\":null,\"favorite\":false,\"nsfw\":null,\"section\":null,\"account_url\":null,\"account_id\":null,\"in_gallery\":false,\"link\":\"https:\\/\\/i.imgur.com\\/CJCA0gW.jpg\"}]},\"success\":true,\"status\":200}")
 	defer server.Close()
 
-	client := createClient(httpC, "testing", "")
+	client, _ := NewClient(httpC, "testing", "")
 	ge, status, err := client.GetInfoFromURL("https://imgur.com/gallery/VZQXk")
 
 	if err != nil {
@@ -129,7 +129,7 @@ func TestGetFromURLGAlbumReal(t *testing.T) {
 	}
 	RapidAPIKey := os.Getenv("RapidAPIKEY")
 
-	client := createClient(new(http.Client), key, RapidAPIKey)
+	client, _ := NewClient(new(http.Client), key, RapidAPIKey)
 
 	tests := []struct {
 		galleryURL string
@@ -212,7 +212,7 @@ func TestGetURLGalleryImageReal(t *testing.T) {
 	}
 	RapidAPIKey := os.Getenv("RapidAPIKEY")
 
-	client := createClient(new(http.Client), key, RapidAPIKey)
+	client, _ := NewClient(new(http.Client), key, RapidAPIKey)
 
 	ge, status, err := client.GetInfoFromURL("https://imgur.com/gallery/uPI76jY")
 
@@ -290,7 +290,7 @@ func TestGetURLImageReal(t *testing.T) {
 	}
 	RapidAPIKey := os.Getenv("RapidAPIKEY")
 
-	client := createClient(new(http.Client), key, RapidAPIKey)
+	client, _ := NewClient(new(http.Client), key, RapidAPIKey)
 
 	ge, status, err := client.GetInfoFromURL("https://imgur.com/ClF8rLe")
 
@@ -333,7 +333,7 @@ func TestGetFromURLImageNoID(t *testing.T) {
 	httpC, server := testHTTPClient500()
 	defer server.Close()
 
-	client := createClient(httpC, "testing", "")
+	client, _ := NewClient(httpC, "testing", "")
 	_, _, err := client.GetInfoFromURL("https://imgur.com/")
 
 	if err == nil {
@@ -346,7 +346,7 @@ func TestGetURLDirectImageSimulated(t *testing.T) {
 	httpC, server := testHTTPClientJSON("{\"data\":{\"id\":\"ClF8rLe\",\"title\":null,\"description\":null,\"datetime\":1451248840,\"type\":\"image\\/jpeg\",\"animated\":false,\"width\":2448,\"height\":3264,\"size\":1071339,\"views\":176,\"bandwidth\":188555664,\"vote\":null,\"favorite\":false,\"nsfw\":null,\"section\":null,\"account_url\":null,\"account_id\":null,\"in_gallery\":false,\"link\":\"https:\\/\\/i.imgur.com\\/ClF8rLe.jpg\"},\"success\":true,\"status\":200}")
 	defer server.Close()
 
-	client := createClient(httpC, "testing", "")
+	client, _ := NewClient(httpC, "testing", "")
 	ge, status, err := client.GetInfoFromURL("https://i.imgur.com/ClF8rLe.jpg")
 
 	if err != nil {
@@ -391,7 +391,7 @@ func TestGetURLDirectImageReal(t *testing.T) {
 	}
 	RapidAPIKey := os.Getenv("RapidAPIKEY")
 
-	client := createClient(new(http.Client), key, RapidAPIKey)
+	client, _ := NewClient(new(http.Client), key, RapidAPIKey)
 
 	ge, status, err := client.GetInfoFromURL("https://i.imgur.com/ClF8rLe.jpg")
 
@@ -434,7 +434,7 @@ func TestGetFromURLDirectImageNoID(t *testing.T) {
 	httpC, server := testHTTPClient500()
 	defer server.Close()
 
-	client := createClient(httpC, "testing", "")
+	client, _ := NewClient(httpC, "testing", "")
 	_, _, err := client.GetInfoFromURL("https://i.imgur.com/")
 
 	if err == nil {
