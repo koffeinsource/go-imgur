@@ -11,7 +11,7 @@ func TestRateLimitImgurSimulated(t *testing.T) {
 
 	defer server.Close()
 
-	client := createClient(httpC, "testing", "")
+	client, _ := NewClient(httpC, "testing", "")
 	rl, err := client.GetRateLimit()
 
 	if err != nil {
@@ -35,7 +35,7 @@ func TestRateLimitRealRapidAPI(t *testing.T) {
 		t.Skip("RapidAPIKEY environment variable not set.")
 	}
 
-	client := createClient(new(http.Client), key, RapidAPIKey)
+	client, _ := NewClient(new(http.Client), key, RapidAPIKey)
 
 	rl, err := client.GetRateLimit()
 
@@ -57,7 +57,7 @@ func TestRateLimitRealImgur(t *testing.T) {
 		t.Skip("IMGURCLIENTID environment variable not set.")
 	}
 
-	client := createClient(new(http.Client), key, "")
+	client, _ := NewClient(new(http.Client), key, "")
 
 	rl, err := client.GetRateLimit()
 
