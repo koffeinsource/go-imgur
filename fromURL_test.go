@@ -242,9 +242,9 @@ func TestGetURLImageSimulated(t *testing.T) {
 	defer server.Close()
 
 	client := new(Client)
-	client.HTTPClient = httpC
+	client.httpClient = httpC
 	client.Log = new(klogger.CLILogger)
-	client.ImgurClientID = "testing"
+	client.imgurAccount.clientID = "testing"
 
 	ge, status, err := client.GetInfoFromURL("https://imgur.com/ClF8rLe")
 

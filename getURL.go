@@ -7,7 +7,7 @@ import (
 )
 
 func (client *Client) createAPIURL(u string) string {
-	if client.RapidAPIKEY == "" {
+	if client.rapidAPIKey == "" {
 		return apiEndpoint + u
 	}
 	return apiEndpointRapidAPI + u
@@ -25,14 +25,14 @@ func (client *Client) getURL(URL string) (string, *RateLimit, error) {
 		return "", nil, errors.New("Could not create request for " + URL + " - " + err.Error())
 	}
 
-	req.Header.Add("Authorization", "Client-ID "+client.ImgurClientID)
-	if client.RapidAPIKEY != "" {
+	req.Header.Add("Authorization", "Client-ID "+client.imgurAccount.clientID)
+	if client.rapidAPIKey != "" {
 		req.Header.Add("x-rapidapi-host", "imgur-apiv3.p.rapidapi.com")
-		req.Header.Add("x-rapidapi-key", client.RapidAPIKEY)
+		req.Header.Add("x-rapidapi-key", client.rapidAPIKey)
 	}
 
 	// Make a request to the sourceURL
-	res, err := client.HTTPClient.Do(req)
+	res, err := client.httpClient.Do(req)
 	if err != nil {
 		return "", nil, errors.New("Could not get " + URL + " - " + err.Error())
 	}
