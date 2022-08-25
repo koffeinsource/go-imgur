@@ -24,7 +24,7 @@ func TestUploadImageErrors(t *testing.T) {
 		t.Fail()
 	}
 
-	img := make([]byte, 5, 5)
+	img := make([]byte, 5)
 
 	// should fail because of invalid type
 	ii, _, err = client.UploadImage(img, "album", "type", "name", "desc")
