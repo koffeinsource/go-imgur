@@ -1,4 +1,4 @@
-module github.com/koffeinsource/go-imgur
+module github.com/mix/go-imgur
 
 go 1.18
 
