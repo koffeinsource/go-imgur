@@ -7,8 +7,34 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"path"
+
+	"github.com/jarcoal/httpmock"
 )
 
+// MockStringResp is a convenience function for using httpmock to stub APIs that return strings
+func MockStringResp(url string, method string, mockResp string, mockRespHeaders map[string]string, statusCodeParam ...int) {
+	statusCode := http.StatusOK
+	if len(statusCodeParam) > 0 {
+		statusCode = statusCodeParam[0]
+	}
+	fmt.Printf("Register struct %s mock for %s\n", method, url)
+	httpmock.RegisterResponder(method, url,
+		func(req *http.Request) (*http.Response, error) {
+			res := httpmock.NewStringResponse(statusCode, mockResp)
+			res.Request = req
+			addRespHeaders(res, mockRespHeaders)
+			return res, nil
+		},
+	)
+}
+
+func addRespHeaders(res *http.Response, headers map[string]string) {
+	for k, v := range headers {
+		res.Header.Add(k, v)
+	}
+}
+
+// testHTTPClientJSON should be removed and all tests refactored to use MockStringResp
 func testHTTPClientJSON(json string) (*http.Client, *httptest.Server) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")

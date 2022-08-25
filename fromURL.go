@@ -118,6 +118,11 @@ func (client *Client) imageURL(url string) (*GenericInfo, int, error) {
 	if id == "" {
 		return nil, -1, errors.New("Could not find ID in URL " + url + ". I was going down imgur.com/ path.")
 	}
+	// check if id is a full filename E.G vsadghes.jpg, and if so, extract the actual id
+	hasDotIndex := strings.LastIndex(id, ".")
+	if hasDotIndex > -1 {
+		id = id[0:hasDotIndex]
+	}
 	client.Log.Debugf("Detected imgur image ID %v. Was going down the imgur.com/ path.", id)
 	ii, status, err := client.GetGalleryImageInfo(id)
 	if err == nil && status < 400 {

@@ -26,3 +26,7 @@ _testmain.go
 imgurcmd/imgurcmd
 .vscode
 dist/
+
+
+# PHPStorm creates.idea folders
+.idea

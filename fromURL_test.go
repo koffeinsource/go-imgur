@@ -1,9 +1,13 @@
 package imgur
 
 import (
+	"github.com/jarcoal/httpmock"
 	"net/http"
 	"os"
 	"testing"
+
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 
 	"github.com/koffeinsource/go-klogger"
 )
@@ -281,6 +285,65 @@ func TestGetURLImageSimulated(t *testing.T) {
 	if status != 200 {
 		t.Fail()
 	}
+}
+
+// Other tests do not correctly simulate and validate the correct path was chosen
+// use this test as template for all other tests
+func TestGetURLImageSimulatedWithExtension(t *testing.T) {
+	g := NewWithT(t)
+	RegisterFailHandler(Fail)
+
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	client, _ := NewClient(&http.Client{}, "testing", "")
+	client.Log = new(klogger.CLILogger)
+	client.ImgurClientID = "testing"
+
+	responseString := "{\"data\":{\"id\":\"ClF8rLe\",\"title\":null,\"description\":null,\"datetime\":1451248840,\"type\":\"image\\/jpeg\",\"animated\":false,\"width\":2448,\"height\":3264,\"size\":1071339,\"views\":176,\"bandwidth\":188555664,\"vote\":null,\"favorite\":false,\"nsfw\":null,\"section\":null,\"account_url\":null,\"account_id\":null,\"in_gallery\":false,\"link\":\"https:\\/\\/i.imgur.com\\/ClF8rLe.jpg\"},\"success\":true,\"status\":200}"
+	MockStringResp("https://api.imgur.com/3/image/ClF8rLe", http.MethodGet, responseString, nil)
+
+	ge, status, err := client.GetInfoFromURL("https://imgur.com/ClF8rLe.jpg")
+
+	info := httpmock.GetCallCountInfo()
+	g.Expect(httpmock.GetTotalCallCount()).To(Equal(1))
+	// get the amount of calls for the registered responder
+	g.Expect(info["GET https://api.imgur.com/3/image/ClF8rLe"]).To(Equal(1))
+
+	if err != nil {
+		t.Errorf("GetInfoFromURL() failed with error: %v", err)
+		t.FailNow()
+	}
+
+	if ge.Album != nil || ge.GAlbum != nil {
+		t.Error("GetInfoFromURL() failed. Returned wrong type.")
+		t.FailNow()
+	}
+
+	if ge.Image == nil && ge.GImage == nil {
+		t.FailNow()
+	}
+
+	if ge.Image != nil {
+		img := ge.Image
+
+		if img.Animated != false || img.Bandwidth != 188555664 || img.Datetime != 1451248840 || img.Description != "" || img.Height != 3264 || img.Width != 2448 || img.ID != "ClF8rLe" || img.Link != "https://i.imgur.com/ClF8rLe.jpg" || img.Views != 176 {
+			t.Fail()
+		}
+	}
+
+	if ge.GImage != nil {
+		img := ge.GImage
+
+		if img.Animated != false || img.Bandwidth != 188555664 || img.Datetime != 1451248840 || img.Description != "" || img.Height != 3264 || img.Width != 2448 || img.ID != "ClF8rLe" || img.Link != "https://i.imgur.com/ClF8rLe.jpg" || img.Views != 176 {
+			t.Fail()
+		}
+	}
+
+	if status != 200 {
+		t.Fail()
+	}
+
 }
 
 func TestGetURLImageReal(t *testing.T) {
