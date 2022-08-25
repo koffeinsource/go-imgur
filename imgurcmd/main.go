@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/koffeinsource/go-imgur"
+	"github.com/mix/go-imgur"
 )
 
 func printRate(client *imgur.Client) {
