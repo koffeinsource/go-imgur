@@ -2,6 +2,7 @@ package imgur
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 )
 
@@ -118,7 +119,7 @@ func (client *Client) imageURL(url string) (*GenericInfo, int, error) {
 	if id == "" {
 		return nil, -1, errors.New("Could not find ID in URL " + url + ". I was going down imgur.com/ path.")
 	}
-	// check if id is a full filename E.G vsadghes.jpg, and if so, extract the actual id
+	// check if id is a full filename E.G `vsadghes.jpg`, and if so, extract the actual id `vsadghes`
 	hasDotIndex := strings.LastIndex(id, ".")
 	if hasDotIndex > -1 {
 		id = id[0:hasDotIndex]
@@ -127,11 +128,13 @@ func (client *Client) imageURL(url string) (*GenericInfo, int, error) {
 	ii, status, err := client.GetGalleryImageInfo(id)
 	if err == nil && status < 400 {
 		ret.GImage = ii
-
 		return &ret, status, err
 	}
 
-	i, st, err := client.GetImageInfo(id)
+	i, statusCode, err := client.GetImageInfo(id)
+	if err != nil {
+		return nil, statusCode, fmt.Errorf("client.GetImageInfo:%w", err)
+	}
 	ret.Image = i
-	return &ret, st, err
+	return &ret, statusCode, nil
 }

@@ -39,19 +39,20 @@ type AlbumInfo struct {
 	Limit       *RateLimit  // Current rate limit
 }
 
-// GetAlbumInfo queries imgur for information on a album
-// returns album info, status code of the request, error
+// GetAlbumInfo queries imgur for information on an album
+// returns album info, status code of the request or of album payload, error
+// http status code of request, -1 if request was not made
 func (client *Client) GetAlbumInfo(id string) (*AlbumInfo, int, error) {
-	body, rl, err := client.getURL("album/" + id)
+	body, statusCode, rl, err := client.getURL("album/" + id)
 	if err != nil {
-		return nil, -1, errors.New("Problem getting URL for album info ID " + id + " - " + err.Error())
+		return nil, statusCode, errors.New("Problem getting URL for album info ID " + id + " - " + err.Error())
 	}
 	//client.Log.Debugf("%v\n", body)
 
 	dec := json.NewDecoder(strings.NewReader(body))
 	var alb albumInfoDataWrapper
 	if err := dec.Decode(&alb); err != nil {
-		return nil, -1, errors.New("Problem decoding json for albumID " + id + " - " + err.Error())
+		return nil, statusCode, errors.New("Problem decoding json for albumID " + id + " - " + err.Error())
 	}
 
 	if !alb.Success {

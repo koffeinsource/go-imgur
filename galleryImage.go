@@ -53,16 +53,16 @@ type GalleryImageInfo struct {
 // GetGalleryImageInfo queries imgur for information on a image
 // returns image info, status code of the request, error
 func (client *Client) GetGalleryImageInfo(id string) (*GalleryImageInfo, int, error) {
-	body, rl, err := client.getURL("gallery/image/" + id)
+	body, statusCode, rl, err := client.getURL("gallery/image/" + id)
 	if err != nil {
-		return nil, -1, errors.New("Problem getting URL for gallery image info ID " + id + " - " + err.Error())
+		return nil, statusCode, errors.New("Problem getting URL for gallery image info ID " + id + " - " + err.Error())
 	}
 	// client.Log.Debugf("%v\n", body)
 
 	dec := json.NewDecoder(strings.NewReader(body))
 	var img galleryImageInfoDataWrapper
 	if err := dec.Decode(&img); err != nil {
-		return nil, -1, errors.New("Problem decoding json for gallery imageID " + id + " - " + err.Error())
+		return nil, statusCode, errors.New("Problem decoding json for gallery imageID " + id + " - " + err.Error())
 	}
 	img.Ii.Limit = rl
 

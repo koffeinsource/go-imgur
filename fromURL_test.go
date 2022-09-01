@@ -1,6 +1,7 @@
 package imgur
 
 import (
+	"fmt"
 	"github.com/jarcoal/httpmock"
 	"net/http"
 	"os"
@@ -242,49 +243,45 @@ func TestGetURLGalleryImageReal(t *testing.T) {
 }
 
 func TestGetURLImageSimulated(t *testing.T) {
-	httpC, server := testHTTPClientJSON("{\"data\":{\"id\":\"ClF8rLe\",\"title\":null,\"description\":null,\"datetime\":1451248840,\"type\":\"image\\/jpeg\",\"animated\":false,\"width\":2448,\"height\":3264,\"size\":1071339,\"views\":176,\"bandwidth\":188555664,\"vote\":null,\"favorite\":false,\"nsfw\":null,\"section\":null,\"account_url\":null,\"account_id\":null,\"in_gallery\":false,\"link\":\"https:\\/\\/i.imgur.com\\/ClF8rLe.jpg\"},\"success\":true,\"status\":200}")
-	defer server.Close()
+	g := NewWithT(t)
+	RegisterFailHandler(Fail)
 
-	client := new(Client)
-	client.HTTPClient = httpC
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	client, _ := NewClient(&http.Client{}, "testing", "")
 	client.Log = new(klogger.CLILogger)
 	client.ImgurClientID = "testing"
 
+	responseString := "{\"data\":{\"id\":\"ClF8rLe\",\"title\":null,\"description\":null,\"datetime\":1451248840,\"type\":\"image\\/jpeg\",\"animated\":false,\"width\":2448,\"height\":3264,\"size\":1071339,\"views\":176,\"bandwidth\":188555664,\"vote\":null,\"favorite\":false,\"nsfw\":null,\"section\":null,\"account_url\":null,\"account_id\":null,\"in_gallery\":false,\"link\":\"https:\\/\\/i.imgur.com\\/ClF8rLe.jpg\"},\"success\":true,\"status\":200}"
+	MockStringResp("https://api.imgur.com/3/image/ClF8rLe", http.MethodGet, responseString, nil)
+
 	ge, status, err := client.GetInfoFromURL("https://imgur.com/ClF8rLe")
+	g.Expect(err).To(BeNil())
+	g.Expect(status).To(Equal(200))
 
-	if err != nil {
-		t.Errorf("GetInfoFromURL() failed with error: %v", err)
-		t.FailNow()
-	}
+	info := httpmock.GetCallCountInfo()
+	g.Expect(httpmock.GetTotalCallCount()).To(Equal(1))
+	// get the amount of calls for the registered responder
+	g.Expect(info["GET https://api.imgur.com/3/image/ClF8rLe"]).To(Equal(1))
 
-	if ge.Album != nil || ge.GAlbum != nil {
-		t.Error("GetInfoFromURL() failed. Returned wrong type.")
-		t.FailNow()
-	}
+	g.Expect(ge.Album).To(BeNil())
+	g.Expect(ge.GAlbum).To(BeNil())
 
-	if ge.Image == nil && ge.GImage == nil {
-		t.FailNow()
-	}
+	g.Expect(ge.Image).NotTo(BeNil())
+	// the mock response is for an Image, not a GalleryImage, so Image will be nil
+	g.Expect(ge.GImage).To(BeNil())
 
-	if ge.Image != nil {
-		img := ge.Image
-
-		if img.Animated != false || img.Bandwidth != 188555664 || img.Datetime != 1451248840 || img.Description != "" || img.Height != 3264 || img.Width != 2448 || img.ID != "ClF8rLe" || img.Link != "https://i.imgur.com/ClF8rLe.jpg" || img.Views != 176 {
-			t.Fail()
-		}
-	}
-
-	if ge.GImage != nil {
-		img := ge.GImage
-
-		if img.Animated != false || img.Bandwidth != 188555664 || img.Datetime != 1451248840 || img.Description != "" || img.Height != 3264 || img.Width != 2448 || img.ID != "ClF8rLe" || img.Link != "https://i.imgur.com/ClF8rLe.jpg" || img.Views != 176 {
-			t.Fail()
-		}
-	}
-
-	if status != 200 {
-		t.Fail()
-	}
+	img := ge.Image
+	g.Expect(img.Animated).To(BeFalse())
+	g.Expect(img.Bandwidth).To(Equal(188555664))
+	g.Expect(img.Datetime).To(Equal(1451248840))
+	g.Expect(img.Description).To(Equal(""))
+	g.Expect(img.Height).To(Equal(3264))
+	g.Expect(img.Width).To(Equal(2448))
+	g.Expect(img.ID).To(Equal("ClF8rLe"))
+	g.Expect(img.Link).To(Equal("https://i.imgur.com/ClF8rLe.jpg"))
+	g.Expect(img.Views).To(Equal(176))
 }
 
 // Other tests do not correctly simulate and validate the correct path was chosen
@@ -304,46 +301,101 @@ func TestGetURLImageSimulatedWithExtension(t *testing.T) {
 	MockStringResp("https://api.imgur.com/3/image/ClF8rLe", http.MethodGet, responseString, nil)
 
 	ge, status, err := client.GetInfoFromURL("https://imgur.com/ClF8rLe.jpg")
+	g.Expect(ge).NotTo(BeNil())
+	g.Expect(err).To(BeNil())
+	g.Expect(status).To(Equal(200))
 
 	info := httpmock.GetCallCountInfo()
 	g.Expect(httpmock.GetTotalCallCount()).To(Equal(1))
 	// get the amount of calls for the registered responder
 	g.Expect(info["GET https://api.imgur.com/3/image/ClF8rLe"]).To(Equal(1))
 
-	if err != nil {
-		t.Errorf("GetInfoFromURL() failed with error: %v", err)
-		t.FailNow()
-	}
+	g.Expect(ge.Album).To(BeNil())
+	g.Expect(ge.GAlbum).To(BeNil())
 
-	if ge.Album != nil || ge.GAlbum != nil {
-		t.Error("GetInfoFromURL() failed. Returned wrong type.")
-		t.FailNow()
-	}
+	g.Expect(ge.Image).NotTo(BeNil())
+	// the mock response is for an Image, not a GalleryImage, so Image will be nil
+	g.Expect(ge.GImage).To(BeNil())
 
-	if ge.Image == nil && ge.GImage == nil {
-		t.FailNow()
-	}
+	img := ge.Image
+	g.Expect(img.Animated).To(BeFalse())
+	g.Expect(img.Bandwidth).To(Equal(188555664))
+	g.Expect(img.Datetime).To(Equal(1451248840))
+	g.Expect(img.Description).To(Equal(""))
+	g.Expect(img.Height).To(Equal(3264))
+	g.Expect(img.Width).To(Equal(2448))
+	g.Expect(img.ID).To(Equal("ClF8rLe"))
+	g.Expect(img.Link).To(Equal("https://i.imgur.com/ClF8rLe.jpg"))
+	g.Expect(img.Views).To(Equal(176))
+}
 
-	if ge.Image != nil {
-		img := ge.Image
+func TestGetURLImageSimulatedWithExtensionNotFound(t *testing.T) {
+	g := NewWithT(t)
+	RegisterFailHandler(Fail)
 
-		if img.Animated != false || img.Bandwidth != 188555664 || img.Datetime != 1451248840 || img.Description != "" || img.Height != 3264 || img.Width != 2448 || img.ID != "ClF8rLe" || img.Link != "https://i.imgur.com/ClF8rLe.jpg" || img.Views != 176 {
-			t.Fail()
-		}
-	}
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
 
-	if ge.GImage != nil {
-		img := ge.GImage
+	client, _ := NewClient(&http.Client{}, "testing", "")
+	client.Log = new(klogger.CLILogger)
+	client.ImgurClientID = "testing"
 
-		if img.Animated != false || img.Bandwidth != 188555664 || img.Datetime != 1451248840 || img.Description != "" || img.Height != 3264 || img.Width != 2448 || img.ID != "ClF8rLe" || img.Link != "https://i.imgur.com/ClF8rLe.jpg" || img.Views != 176 {
-			t.Fail()
-		}
-	}
+	MockStringResp("https://api.imgur.com/3/image/ClF8rLe", http.MethodGet, "", nil, 404)
 
-	if status != 200 {
-		t.Fail()
-	}
+	ge, status, err := client.GetInfoFromURL("https://imgur.com/ClF8rLe.jpg")
+	g.Expect(err).NotTo(BeNil())
+	g.Expect(status).To(Equal(404))
+	g.Expect(ge).To(BeNil())
 
+	info := httpmock.GetCallCountInfo()
+	g.Expect(httpmock.GetTotalCallCount()).To(Equal(1))
+	// get the amount of calls for the registered responder
+	g.Expect(info["GET https://api.imgur.com/3/image/ClF8rLe"]).To(Equal(1))
+}
+
+func TestGetURLImageSimulatedWithExtensionMoved302(t *testing.T) {
+	g := NewWithT(t)
+	RegisterFailHandler(Fail)
+
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	client, _ := NewClient(&http.Client{}, "testing", "")
+	client.Log = new(klogger.CLILogger)
+	client.ImgurClientID = "testing"
+
+	headers := make(map[string]string)
+	headers["Location"] = "moved_url"
+	MockStringResp("https://api.imgur.com/3/image/ClF8rLe", http.MethodGet, "", headers, 302)
+	responseString := "{\"data\":{\"id\":\"ClF8rLe\",\"title\":null,\"description\":null,\"datetime\":1451248840,\"type\":\"image\\/jpeg\",\"animated\":false,\"width\":2448,\"height\":3264,\"size\":1071339,\"views\":176,\"bandwidth\":188555664,\"vote\":null,\"favorite\":false,\"nsfw\":null,\"section\":null,\"account_url\":null,\"account_id\":null,\"in_gallery\":false,\"link\":\"https:\\/\\/i.imgur.com\\/ClF8rLe.jpg\"},\"success\":true,\"status\":200}"
+	MockStringResp("https://api.imgur.com/3/image/moved_url", http.MethodGet, responseString, nil)
+
+	ge, status, err := client.GetInfoFromURL("https://imgur.com/ClF8rLe.jpg")
+	fmt.Printf("%v \n", err)
+	g.Expect(ge).NotTo(BeNil())
+	g.Expect(err).To(BeNil())
+	g.Expect(status).To(Equal(200))
+
+	info := httpmock.GetCallCountInfo()
+	g.Expect(httpmock.GetTotalCallCount()).To(Equal(2))
+	// get the amount of calls for the registered responder
+	g.Expect(info["GET https://api.imgur.com/3/image/ClF8rLe"]).To(Equal(1))
+	g.Expect(info["GET https://api.imgur.com/3/image/moved_url"]).To(Equal(1))
+
+	g.Expect(ge.Image).NotTo(BeNil())
+	// the mock response is for an Image, not a GalleryImage, so Image will be nil
+	g.Expect(ge.GImage).To(BeNil())
+
+	img := ge.Image
+	g.Expect(img.Animated).To(BeFalse())
+	g.Expect(img.Bandwidth).To(Equal(188555664))
+	g.Expect(img.Datetime).To(Equal(1451248840))
+	g.Expect(img.Description).To(Equal(""))
+	g.Expect(img.Height).To(Equal(3264))
+	g.Expect(img.Width).To(Equal(2448))
+	g.Expect(img.ID).To(Equal("ClF8rLe"))
+	g.Expect(img.Link).To(Equal("https://i.imgur.com/ClF8rLe.jpg"))
+	g.Expect(img.Views).To(Equal(176))
 }
 
 func TestGetURLImageReal(t *testing.T) {
