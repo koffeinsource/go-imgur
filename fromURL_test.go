@@ -1,7 +1,6 @@
 package imgur
 
 import (
-	"fmt"
 	"github.com/jarcoal/httpmock"
 	"net/http"
 	"os"
@@ -371,7 +370,6 @@ func TestGetURLImageSimulatedWithExtensionMoved302(t *testing.T) {
 	MockStringResp("https://api.imgur.com/3/image/moved_url", http.MethodGet, responseString, nil)
 
 	ge, status, err := client.GetInfoFromURL("https://imgur.com/ClF8rLe.jpg")
-	fmt.Printf("%v \n", err)
 	g.Expect(ge).NotTo(BeNil())
 	g.Expect(err).To(BeNil())
 	g.Expect(status).To(Equal(200))
