@@ -17,7 +17,7 @@ type GenericInfo struct {
 }
 
 // GetInfoFromURL tries to query imgur based on information identified in the URL.
-// returns image/album info, status code of the request, error
+// returns image/album info, http status code of the request, error
 func (client *Client) GetInfoFromURL(url string) (*GenericInfo, int, error) {
 	url = strings.TrimSpace(url)
 
