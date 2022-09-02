@@ -268,7 +268,7 @@ func TestGetURLImageSimulated(t *testing.T) {
 	g.Expect(ge.GAlbum).To(BeNil())
 
 	g.Expect(ge.Image).NotTo(BeNil())
-	// the mock response is for an Image, not a GalleryImage, so Image will be nil
+	// the mock response is for an Image, not a GalleryImage, so GImage will be nil
 	g.Expect(ge.GImage).To(BeNil())
 
 	img := ge.Image
@@ -313,7 +313,7 @@ func TestGetURLImageSimulatedWithExtension(t *testing.T) {
 	g.Expect(ge.GAlbum).To(BeNil())
 
 	g.Expect(ge.Image).NotTo(BeNil())
-	// the mock response is for an Image, not a GalleryImage, so Image will be nil
+	// the mock response is for an Image, not a GalleryImage, so GImage will be nil
 	g.Expect(ge.GImage).To(BeNil())
 
 	img := ge.Image
@@ -381,7 +381,7 @@ func TestGetURLImageSimulatedWithExtensionMoved302(t *testing.T) {
 	g.Expect(info["GET https://api.imgur.com/3/image/moved_url"]).To(Equal(1))
 
 	g.Expect(ge.Image).NotTo(BeNil())
-	// the mock response is for an Image, not a GalleryImage, so Image will be nil
+	// the mock response is for an Image, not a GalleryImage, so GImage will be nil
 	g.Expect(ge.GImage).To(BeNil())
 
 	img := ge.Image
