@@ -15,14 +15,15 @@ func (client *Client) createAPIURL(u string) string {
 
 // getURL returns
 // - body as string
+// - http status code of request, -1 if request was not made
 // - RateLimit with current limits
 // - error in case something broke
-func (client *Client) getURL(URL string) (string, *RateLimit, error) {
+func (client *Client) getURL(URL string) (string, int, *RateLimit, error) {
 	URL = client.createAPIURL(URL)
 	client.Log.Infof("Requesting URL %v\n", URL)
 	req, err := http.NewRequest("GET", URL, nil)
 	if err != nil {
-		return "", nil, errors.New("Could not create request for " + URL + " - " + err.Error())
+		return "", -1, nil, errors.New("Could not create request for " + URL + " - " + err.Error())
 	}
 
 	req.Header.Add("Authorization", "Client-ID "+client.ImgurClientID)
@@ -34,18 +35,21 @@ func (client *Client) getURL(URL string) (string, *RateLimit, error) {
 	// Make a request to the sourceURL
 	res, err := client.HTTPClient.Do(req)
 	if err != nil {
-		return "", nil, errors.New("Could not get " + URL + " - " + err.Error())
+		if res == nil {
+			return "", -1, nil, errors.New("Could not get " + URL + " - " + err.Error())
+		}
+		return "", res.StatusCode, nil, errors.New("Could not get " + URL + " - " + err.Error())
 	}
 	defer res.Body.Close()
 
 	if !(res.StatusCode >= 200 && res.StatusCode <= 300) {
-		return "", nil, errors.New("HTTP status indicates an error for " + URL + " - " + res.Status)
+		return "", res.StatusCode, nil, errors.New("HTTP status indicates an error for " + URL + " - " + res.Status)
 	}
 
 	// Read the whole body
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		return "", nil, errors.New("Problem reading the body for " + URL + " - " + err.Error())
+		return "", res.StatusCode, nil, errors.New("Problem reading the body for " + URL + " - " + err.Error())
 	}
 
 	// Get RateLimit headers
@@ -54,5 +58,5 @@ func (client *Client) getURL(URL string) (string, *RateLimit, error) {
 		client.Log.Infof("Problem with extracting rate limits: %v", err)
 	}
 
-	return string(body[:]), rl, nil
+	return string(body[:]), res.StatusCode, rl, nil
 }

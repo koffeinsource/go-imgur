@@ -48,16 +48,16 @@ type GalleryAlbumInfo struct {
 // GetGalleryAlbumInfo queries imgur for information on a gallery album
 // returns album info, status code of the request, error
 func (client *Client) GetGalleryAlbumInfo(id string) (*GalleryAlbumInfo, int, error) {
-	body, rl, err := client.getURL("gallery/album/" + id)
+	body, statusCode, rl, err := client.getURL("gallery/album/" + id)
 	if err != nil {
-		return nil, -1, errors.New("Problem getting URL for gallery album info ID " + id + " - " + err.Error())
+		return nil, statusCode, errors.New("Problem getting URL for gallery album info ID " + id + " - " + err.Error())
 	}
 	// client.Log.Debugf("%v\n", body)
 
 	dec := json.NewDecoder(strings.NewReader(body))
 	var alb galleryAlbumInfoDataWrapper
 	if err := dec.Decode(&alb); err != nil {
-		return nil, -1, errors.New("Problem decoding json for gallery albumID " + id + " - " + err.Error())
+		return nil, statusCode, errors.New("Problem decoding json for gallery albumID " + id + " - " + err.Error())
 	}
 	alb.Ai.Limit = rl
 

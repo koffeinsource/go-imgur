@@ -42,17 +42,17 @@ type ImageInfo struct {
 }
 
 // GetImageInfo queries imgur for information on a image
-// returns image info, status code of the request, error
+// returns image info, http status code of the request, error
 func (client *Client) GetImageInfo(id string) (*ImageInfo, int, error) {
-	body, rl, err := client.getURL("image/" + id)
+	body, statusCode, rl, err := client.getURL("image/" + id)
 	if err != nil {
-		return nil, -1, errors.New("Problem getting URL for image info ID " + id + " - " + err.Error())
+		return nil, statusCode, errors.New("Problem getting URL for image info ID " + id + " - " + err.Error())
 	}
 
 	dec := json.NewDecoder(strings.NewReader(body))
 	var img imageInfoDataWrapper
 	if err := dec.Decode(&img); err != nil {
-		return nil, -1, errors.New("Problem decoding json for imageID " + id + " - " + err.Error())
+		return nil, statusCode, errors.New("Problem decoding json for imageID " + id + " - " + err.Error())
 	}
 	img.Ii.Limit = rl
 

@@ -76,7 +76,7 @@ func extractRateLimits(h http.Header) (rl *RateLimit, err error) {
 // GetRateLimit returns the current rate limit without doing anything else
 func (client *Client) GetRateLimit() (*RateLimit, error) {
 	// We are requesting any URL and parse the returned HTTP headers
-	body, rl, err := client.getURL("account/kaffeeshare")
+	body, _, rl, err := client.getURL("account/kaffeeshare")
 
 	if err != nil {
 		return nil, errors.New("Problem getting URL for rate - " + err.Error())
