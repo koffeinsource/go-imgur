@@ -98,13 +98,16 @@ func (client *Client) galleryURL(url string) (*GenericInfo, int, error) {
 	ai, status, err := client.GetGalleryAlbumInfo(id)
 	if err == nil && status < 400 {
 		ret.GAlbum = ai
-		return &ret, status, err
+		return &ret, status, nil
 	}
 	// fallback to GetGalleryImageInfo
 	client.Log.Debugf("Failed to retrieve imgur gallery album. Attempting to retrieve imgur gallery image. err: %v status: %d", err, status)
-	ii, status, err := client.GetGalleryImageInfo(id)
+	ii, statusCode, err := client.GetGalleryImageInfo(id)
+	if err != nil {
+		return nil, statusCode, fmt.Errorf("client.GetGalleryImageInfo:%w", err)
+	}
 	ret.GImage = ii
-	return &ret, status, err
+	return &ret, statusCode, nil
 }
 
 func (client *Client) imageURL(url string) (*GenericInfo, int, error) {
