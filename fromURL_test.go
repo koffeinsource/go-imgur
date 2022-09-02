@@ -99,31 +99,66 @@ func TestGetFromURLGalleryNoID(t *testing.T) {
 }
 
 func TestGetFromURLGAlbumSimulated(t *testing.T) {
-	httpC, server := testHTTPClientJSON("{\"data\":{\"id\":\"VZQXk\",\"title\":\"As it turns out, most people cannot draw a bike.\",\"description\":null,\"datetime\":1460715031,\"cover\":\"CJCA0gW\",\"cover_width\":1200,\"cover_height\":786,\"account_url\":\"mrcassette\",\"account_id\":157430,\"privacy\":\"public\",\"layout\":\"blog\",\"views\":667581,\"link\":\"https:\\/\\/imgur.com\\/a\\/VZQXk\",\"ups\":13704,\"downs\":113,\"favorite\":false,\"nsfw\":false,\"section\":\"pics\",\"images_count\":1,\"in_gallery\":true,\"images\":[{\"id\":\"CJCA0gW\",\"title\":null,\"description\":\"by Designer Gianluca Gimini\\nhttps:\\/\\/www.behance.net\\/gallery\\/35437979\\/Velocipedia\",\"datetime\":1460715032,\"type\":\"image\\/jpeg\",\"animated\":false,\"width\":1200,\"height\":786,\"size\":362373,\"views\":4420880,\"bandwidth\":1602007548240,\"vote\":null,\"favorite\":false,\"nsfw\":null,\"section\":null,\"account_url\":null,\"account_id\":null,\"in_gallery\":false,\"link\":\"https:\\/\\/i.imgur.com\\/CJCA0gW.jpg\"}]},\"success\":true,\"status\":200}")
-	defer server.Close()
+	g := NewWithT(t)
+	RegisterFailHandler(Fail)
 
-	client, _ := NewClient(httpC, "testing", "")
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	client, _ := NewClient(&http.Client{}, "testing", "")
+	client.Log = new(klogger.CLILogger)
+	client.ImgurClientID = "testing"
+
+	responseString := "{\"data\":{\"id\":\"VZQXk\",\"title\":\"As it turns out, most people cannot draw a bike.\",\"description\":null,\"datetime\":1460715031,\"cover\":\"CJCA0gW\",\"cover_width\":1200,\"cover_height\":786,\"account_url\":\"mrcassette\",\"account_id\":157430,\"privacy\":\"public\",\"layout\":\"blog\",\"views\":667581,\"link\":\"https:\\/\\/imgur.com\\/a\\/VZQXk\",\"ups\":13704,\"downs\":113,\"favorite\":false,\"nsfw\":false,\"section\":\"pics\",\"images_count\":1,\"in_gallery\":true,\"images\":[{\"id\":\"CJCA0gW\",\"title\":null,\"description\":\"by Designer Gianluca Gimini\\nhttps:\\/\\/www.behance.net\\/gallery\\/35437979\\/Velocipedia\",\"datetime\":1460715032,\"type\":\"image\\/jpeg\",\"animated\":false,\"width\":1200,\"height\":786,\"size\":362373,\"views\":4420880,\"bandwidth\":1602007548240,\"vote\":null,\"favorite\":false,\"nsfw\":null,\"section\":null,\"account_url\":null,\"account_id\":null,\"in_gallery\":false,\"link\":\"https:\\/\\/i.imgur.com\\/CJCA0gW.jpg\"}]},\"success\":true,\"status\":200}"
+	MockStringResp("https://api.imgur.com/3/gallery/album/VZQXk", http.MethodGet, responseString, nil)
+
 	ge, status, err := client.GetInfoFromURL("https://imgur.com/gallery/VZQXk")
+	g.Expect(err).To(BeNil())
+	g.Expect(status).To(Equal(http.StatusOK))
+	g.Expect(ge).NotTo(BeNil())
 
-	if err != nil {
-		t.Errorf("GetInfoFromURL() failed with error: %v", err)
-		t.FailNow()
-	}
+	info := httpmock.GetCallCountInfo()
+	g.Expect(httpmock.GetTotalCallCount()).To(Equal(1))
+	// get the amount of calls for the registered responder
+	g.Expect(info["GET https://api.imgur.com/3/gallery/album/VZQXk"]).To(Equal(1))
 
-	if ge.Album != nil || ge.GAlbum == nil || ge.GImage != nil || ge.Image != nil {
-		t.Error("GetInfoFromURL() failed. Returned wrong type.")
-		t.FailNow()
-	}
+	g.Expect(ge.Album).To(BeNil())
+	g.Expect(ge.GImage).To(BeNil())
+	g.Expect(ge.Image).To(BeNil())
+
+	g.Expect(ge.GAlbum).NotTo(BeNil())
 
 	alb := ge.GAlbum
 
 	if alb.Title != "As it turns out, most people cannot draw a bike." || alb.Cover != "CJCA0gW" || alb.CoverWidth != 1200 || alb.CoverHeight != 786 || alb.Link != "https://imgur.com/a/VZQXk" || alb.ImagesCount != 1 || alb.Images[0].ID != "CJCA0gW" || alb.Ups != 13704 || alb.Downs != 113 {
 		t.Fail()
 	}
+}
 
-	if status != 200 {
-		t.Fail()
-	}
+func TestGetFromURLGAlbumSimulatedNotFound(t *testing.T) {
+	g := NewWithT(t)
+	RegisterFailHandler(Fail)
+
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	client, _ := NewClient(&http.Client{}, "testing", "")
+	client.Log = new(klogger.CLILogger)
+	client.ImgurClientID = "testing"
+
+	MockStringResp("https://api.imgur.com/3/gallery/album/VZQXk", http.MethodGet, "", nil, 404)
+	MockStringResp("https://api.imgur.com/3/gallery/image/VZQXk", http.MethodGet, "", nil, 404)
+
+	ge, status, err := client.GetInfoFromURL("https://imgur.com/gallery/VZQXk")
+	g.Expect(err).NotTo(BeNil())
+	g.Expect(status).To(Equal(http.StatusNotFound))
+	g.Expect(ge).To(BeNil())
+
+	info := httpmock.GetCallCountInfo()
+	g.Expect(httpmock.GetTotalCallCount()).To(Equal(2))
+	// get the amount of calls for the registered responder
+	g.Expect(info["GET https://api.imgur.com/3/gallery/album/VZQXk"]).To(Equal(1))
+	g.Expect(info["GET https://api.imgur.com/3/gallery/image/VZQXk"]).To(Equal(1))
 }
 
 func TestGetFromURLGAlbumReal(t *testing.T) {
@@ -302,7 +337,7 @@ func TestGetURLImageSimulatedWithExtension(t *testing.T) {
 	ge, status, err := client.GetInfoFromURL("https://imgur.com/ClF8rLe.jpg")
 	g.Expect(ge).NotTo(BeNil())
 	g.Expect(err).To(BeNil())
-	g.Expect(status).To(Equal(200))
+	g.Expect(status).To(Equal(http.StatusOK))
 
 	info := httpmock.GetCallCountInfo()
 	g.Expect(httpmock.GetTotalCallCount()).To(Equal(1))
@@ -343,7 +378,7 @@ func TestGetURLImageSimulatedWithExtensionNotFound(t *testing.T) {
 
 	ge, status, err := client.GetInfoFromURL("https://imgur.com/ClF8rLe.jpg")
 	g.Expect(err).NotTo(BeNil())
-	g.Expect(status).To(Equal(404))
+	g.Expect(status).To(Equal(http.StatusNotFound))
 	g.Expect(ge).To(BeNil())
 
 	info := httpmock.GetCallCountInfo()
@@ -372,7 +407,7 @@ func TestGetURLImageSimulatedWithExtensionMoved302(t *testing.T) {
 	ge, status, err := client.GetInfoFromURL("https://imgur.com/ClF8rLe.jpg")
 	g.Expect(ge).NotTo(BeNil())
 	g.Expect(err).To(BeNil())
-	g.Expect(status).To(Equal(200))
+	g.Expect(status).To(Equal(http.StatusOK))
 
 	info := httpmock.GetCallCountInfo()
 	g.Expect(httpmock.GetTotalCallCount()).To(Equal(2))
