@@ -7,16 +7,22 @@ import (
 	"github.com/koffeinsource/go-klogger"
 )
 
+// ClientAccount describe authontification
+type ClientAccount struct {
+	clientID    string // client ID received after registration
+	accessToken string // is your secret key used to access the user's data
+}
+
 // Client used to for go-imgur
 type Client struct {
-	HTTPClient    *http.Client
-	Log           klogger.KLogger
-	ImgurClientID string
-	RapidAPIKEY   string
+	Log          klogger.KLogger
+	httpClient   *http.Client
+	imgurAccount ClientAccount
+	rapidAPIKey  string
 }
 
 // NewClient simply creates an imgur client. RapidAPIKEY is "" if you are using the free API.
-func NewClient(httpClient *http.Client, clientID string, rapidAPIKEY string) (*Client, error) {
+func NewClient(httpClient *http.Client, clientID string, rapidAPIKey string) (*Client, error) {
 	logger := new(klogger.CLILogger)
 
 	if len(clientID) == 0 {
@@ -25,14 +31,16 @@ func NewClient(httpClient *http.Client, clientID string, rapidAPIKEY string) (*C
 		return nil, fmt.Errorf(msg)
 	}
 
-	if len(rapidAPIKEY) == 0 {
+	if len(rapidAPIKey) == 0 {
 		logger.Infof("rapid api key is empty")
 	}
 
 	return &Client{
-		HTTPClient:    httpClient,
-		Log:           logger,
-		ImgurClientID: clientID,
-		RapidAPIKEY:   rapidAPIKEY,
+		httpClient:  httpClient,
+		Log:         logger,
+		rapidAPIKey: rapidAPIKey,
+		imgurAccount: ClientAccount{
+			clientID: clientID,
+		},
 	}, nil
 }

@@ -107,7 +107,7 @@ func TestGetFromURLGAlbumSimulated(t *testing.T) {
 
 	client, _ := NewClient(&http.Client{}, "testing", "")
 	client.Log = new(klogger.CLILogger)
-	client.ImgurClientID = "testing"
+	client.imgurAccount.clientID = "testing"
 
 	responseString := "{\"data\":{\"id\":\"VZQXk\",\"title\":\"As it turns out, most people cannot draw a bike.\",\"description\":null,\"datetime\":1460715031,\"cover\":\"CJCA0gW\",\"cover_width\":1200,\"cover_height\":786,\"account_url\":\"mrcassette\",\"account_id\":157430,\"privacy\":\"public\",\"layout\":\"blog\",\"views\":667581,\"link\":\"https:\\/\\/imgur.com\\/a\\/VZQXk\",\"ups\":13704,\"downs\":113,\"favorite\":false,\"nsfw\":false,\"section\":\"pics\",\"images_count\":1,\"in_gallery\":true,\"images\":[{\"id\":\"CJCA0gW\",\"title\":null,\"description\":\"by Designer Gianluca Gimini\\nhttps:\\/\\/www.behance.net\\/gallery\\/35437979\\/Velocipedia\",\"datetime\":1460715032,\"type\":\"image\\/jpeg\",\"animated\":false,\"width\":1200,\"height\":786,\"size\":362373,\"views\":4420880,\"bandwidth\":1602007548240,\"vote\":null,\"favorite\":false,\"nsfw\":null,\"section\":null,\"account_url\":null,\"account_id\":null,\"in_gallery\":false,\"link\":\"https:\\/\\/i.imgur.com\\/CJCA0gW.jpg\"}]},\"success\":true,\"status\":200}"
 	MockStringResp("https://api.imgur.com/3/gallery/album/VZQXk", http.MethodGet, responseString, nil)
@@ -144,7 +144,7 @@ func TestGetFromURLGAlbumSimulatedNotFound(t *testing.T) {
 
 	client, _ := NewClient(&http.Client{}, "testing", "")
 	client.Log = new(klogger.CLILogger)
-	client.ImgurClientID = "testing"
+	client.imgurAccount.clientID = "testing"
 
 	MockStringResp("https://api.imgur.com/3/gallery/album/VZQXk", http.MethodGet, "", nil, 404)
 	MockStringResp("https://api.imgur.com/3/gallery/image/VZQXk", http.MethodGet, "", nil, 404)
@@ -285,7 +285,7 @@ func TestGetURLImageSimulated(t *testing.T) {
 
 	client, _ := NewClient(&http.Client{}, "testing", "")
 	client.Log = new(klogger.CLILogger)
-	client.ImgurClientID = "testing"
+	client.imgurAccount.clientID = "testing"
 
 	responseString := "{\"data\":{\"id\":\"ClF8rLe\",\"title\":null,\"description\":null,\"datetime\":1451248840,\"type\":\"image\\/jpeg\",\"animated\":false,\"width\":2448,\"height\":3264,\"size\":1071339,\"views\":176,\"bandwidth\":188555664,\"vote\":null,\"favorite\":false,\"nsfw\":null,\"section\":null,\"account_url\":null,\"account_id\":null,\"in_gallery\":false,\"link\":\"https:\\/\\/i.imgur.com\\/ClF8rLe.jpg\"},\"success\":true,\"status\":200}"
 	MockStringResp("https://api.imgur.com/3/image/ClF8rLe", http.MethodGet, responseString, nil)
@@ -329,7 +329,7 @@ func TestGetURLImageSimulatedWithExtension(t *testing.T) {
 
 	client, _ := NewClient(&http.Client{}, "testing", "")
 	client.Log = new(klogger.CLILogger)
-	client.ImgurClientID = "testing"
+	client.imgurAccount.clientID = "testing"
 
 	responseString := "{\"data\":{\"id\":\"ClF8rLe\",\"title\":null,\"description\":null,\"datetime\":1451248840,\"type\":\"image\\/jpeg\",\"animated\":false,\"width\":2448,\"height\":3264,\"size\":1071339,\"views\":176,\"bandwidth\":188555664,\"vote\":null,\"favorite\":false,\"nsfw\":null,\"section\":null,\"account_url\":null,\"account_id\":null,\"in_gallery\":false,\"link\":\"https:\\/\\/i.imgur.com\\/ClF8rLe.jpg\"},\"success\":true,\"status\":200}"
 	MockStringResp("https://api.imgur.com/3/image/ClF8rLe", http.MethodGet, responseString, nil)
@@ -372,7 +372,7 @@ func TestGetURLImageSimulatedWithExtensionNotFound(t *testing.T) {
 
 	client, _ := NewClient(&http.Client{}, "testing", "")
 	client.Log = new(klogger.CLILogger)
-	client.ImgurClientID = "testing"
+	client.imgurAccount.clientID = "testing"
 
 	MockStringResp("https://api.imgur.com/3/image/ClF8rLe", http.MethodGet, "", nil, 404)
 
@@ -396,7 +396,7 @@ func TestGetURLImageSimulatedWithExtensionMoved302(t *testing.T) {
 
 	client, _ := NewClient(&http.Client{}, "testing", "")
 	client.Log = new(klogger.CLILogger)
-	client.ImgurClientID = "testing"
+	client.imgurAccount.clientID = "testing"
 
 	headers := make(map[string]string)
 	headers["Location"] = "moved_url"
