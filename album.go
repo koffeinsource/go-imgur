@@ -47,8 +47,6 @@ func (client *Client) GetAlbumInfo(id string) (*AlbumInfo, int, error) {
 	if err != nil {
 		return nil, statusCode, errors.New("Problem getting URL for album info ID " + id + " - " + err.Error())
 	}
-	//client.Log.Debugf("%v\n", body)
-
 	dec := json.NewDecoder(strings.NewReader(body))
 	var alb albumInfoDataWrapper
 	if err := dec.Decode(&alb); err != nil {
