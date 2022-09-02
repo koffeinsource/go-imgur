@@ -128,7 +128,7 @@ func (client *Client) imageURL(url string) (*GenericInfo, int, error) {
 	ii, status, err := client.GetGalleryImageInfo(id)
 	if err == nil && status < 400 {
 		ret.GImage = ii
-		return &ret, status, fmt.Errorf("client.GetGalleryImageInfo:%w", err)
+		return &ret, status, nil
 	}
 
 	i, statusCode, err := client.GetImageInfo(id)
