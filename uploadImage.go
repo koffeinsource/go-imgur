@@ -37,13 +37,13 @@ func (client *Client) UploadImage(image []byte, album string, dtype string, titl
 		return nil, -1, errors.New("Could create request for " + URL + " - " + err.Error())
 	}
 
-	req.Header.Add("Authorization", "Client-ID "+client.ImgurClientID)
+	req.Header.Add("Authorization", "Client-ID "+client.imgurAccount.clientID)
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-	if client.RapidAPIKEY != "" {
-		req.Header.Add("X-RapidAPI-Key", client.RapidAPIKEY)
+	if client.rapidAPIKey != "" {
+		req.Header.Add("X-RapidAPI-Key", client.rapidAPIKey)
 	}
 
-	res, err := client.HTTPClient.Do(req)
+	res, err := client.httpClient.Do(req)
 	if err != nil {
 		return nil, -1, errors.New("Could not post " + URL + " - " + err.Error())
 	}
