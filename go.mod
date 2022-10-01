@@ -4,5 +4,5 @@ go 1.14
 
 require (
 	github.com/koffeinsource/go-klogger v0.1.1
-	github.com/stretchr/testify v1.8.0 // indirect
+	github.com/stretchr/testify v1.8.0
 )
