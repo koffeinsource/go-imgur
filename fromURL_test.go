@@ -14,7 +14,6 @@ func TestGetFromURLAlbumSimulated(t *testing.T) {
 
 	client, _ := NewClient(httpC, "testing", "")
 	ge, status, err := client.GetInfoFromURL("https://imgur.com/a/VZQXk")
-
 	if err != nil {
 		t.Errorf("GetInfoFromURL() failed with error: %v", err)
 		t.FailNow()
@@ -45,26 +44,36 @@ func TestGetFromURLAlbumReal(t *testing.T) {
 
 	client, _ := NewClient(new(http.Client), key, RapidAPIKey)
 
-	ge, status, err := client.GetInfoFromURL("https://imgur.com/a/VZQXk")
+	checker := func(url string) {
+		ge, status, err := client.GetInfoFromURL(url)
+		if err != nil {
+			t.Errorf("GetInfoFromURL() failed with error: %v", err)
+			t.FailNow()
+		}
 
-	if err != nil {
-		t.Errorf("GetInfoFromURL() failed with error: %v", err)
-		t.FailNow()
+		if ge.Album == nil || ge.GAlbum != nil || ge.GImage != nil || ge.Image != nil {
+			t.Error("GetInfoFromURL() failed. Returned wrong type.")
+			t.FailNow()
+		}
+
+		alb := ge.Album
+
+		if alb.Title != "Gianluca Gimini's bikes" || alb.Cover != "CJCA0gW" || alb.CoverWidth != 1200 || alb.CoverHeight != 786 || alb.Link != "https://imgur.com/a/VZQXk" || alb.ImagesCount != 14 || alb.Images[0].ID != "CJCA0gW" {
+			t.Fail()
+		}
+
+		if status != 200 {
+			t.Fail()
+		}
 	}
 
-	if ge.Album == nil || ge.GAlbum != nil || ge.GImage != nil || ge.Image != nil {
-		t.Error("GetInfoFromURL() failed. Returned wrong type.")
-		t.FailNow()
+	TEST_URLS := []string{
+		"https://imgur.com/a/VZQXk",
+		"https://imgur.io/a/VZQXk",
 	}
 
-	alb := ge.Album
-
-	if alb.Title != "Gianluca Gimini's bikes" || alb.Cover != "CJCA0gW" || alb.CoverWidth != 1200 || alb.CoverHeight != 786 || alb.Link != "https://imgur.com/a/VZQXk" || alb.ImagesCount != 14 || alb.Images[0].ID != "CJCA0gW" {
-		t.Fail()
-	}
-
-	if status != 200 {
-		t.Fail()
+	for _, url := range TEST_URLS {
+		checker(url)
 	}
 }
 
@@ -73,11 +82,22 @@ func TestGetFromURLAlbumNoID(t *testing.T) {
 	defer server.Close()
 	client, _ := NewClient(httpC, "testing", "")
 
-	_, _, err := client.GetInfoFromURL("https://imgur.com/a/")
+	checker := func(url string) {
+		_, _, err := client.GetInfoFromURL(url)
 
-	if err == nil {
-		t.Error("GetInfoFromURL() did not failed but should have.")
-		t.FailNow()
+		if err == nil {
+			t.Error("GetInfoFromURL() did not failed but should have.")
+			t.FailNow()
+		}
+	}
+
+	TEST_URLS := []string{
+		"https://imgur.com/a/",
+		"https://imgur.io/a/",
+	}
+
+	for _, url := range TEST_URLS {
+		checker(url)
 	}
 }
 
@@ -86,11 +106,22 @@ func TestGetFromURLGalleryNoID(t *testing.T) {
 	defer server.Close()
 	client, _ := NewClient(httpC, "testing", "")
 
-	_, _, err := client.GetInfoFromURL("https://imgur.com/gallery/")
+	checker := func(url string) {
+		_, _, err := client.GetInfoFromURL(url)
 
-	if err == nil {
-		t.Error("GetInfoFromURL() did not failed but should have.")
-		t.FailNow()
+		if err == nil {
+			t.Error("GetInfoFromURL() did not failed but should have.")
+			t.FailNow()
+		}
+	}
+
+	TEST_URLS := []string{
+		"https://imgur.com/gallery/",
+		"https://imgur.io/gallery/",
+	}
+
+	for _, url := range TEST_URLS {
+		checker(url)
 	}
 }
 
@@ -100,7 +131,6 @@ func TestGetFromURLGAlbumSimulated(t *testing.T) {
 
 	client, _ := NewClient(httpC, "testing", "")
 	ge, status, err := client.GetInfoFromURL("https://imgur.com/gallery/VZQXk")
-
 	if err != nil {
 		t.Errorf("GetInfoFromURL() failed with error: %v", err)
 		t.FailNow()
@@ -149,6 +179,30 @@ func TestGetFromURLGAlbumReal(t *testing.T) {
 		},
 		{
 			galleryURL: "https://imgur.com/gallery/t6l1GiW",
+			expected: map[string]interface{}{
+				"title":        "Funny Random Meme and Twitter Dump",
+				"cover":        "60wTouU",
+				"coverWidth":   1242,
+				"coverHeight":  1512,
+				"link":         "https://imgur.com/a/t6l1GiW",
+				"imagesCount":  50,
+				"firstImageID": "60wTouU",
+			},
+		},
+		{
+			galleryURL: "https://imgur.io/gallery/VZQXk",
+			expected: map[string]interface{}{
+				"title":        "As it turns out, most people cannot draw a bike.",
+				"cover":        "CJCA0gW",
+				"coverWidth":   1200,
+				"coverHeight":  786,
+				"link":         "https://imgur.com/a/VZQXk",
+				"imagesCount":  14,
+				"firstImageID": "CJCA0gW",
+			},
+		},
+		{
+			galleryURL: "https://imgur.io/gallery/t6l1GiW",
 			expected: map[string]interface{}{
 				"title":        "Funny Random Meme and Twitter Dump",
 				"cover":        "60wTouU",
@@ -214,26 +268,36 @@ func TestGetURLGalleryImageReal(t *testing.T) {
 
 	client, _ := NewClient(new(http.Client), key, RapidAPIKey)
 
-	ge, status, err := client.GetInfoFromURL("https://imgur.com/gallery/uPI76jY")
+	checker := func(url string) {
+		ge, status, err := client.GetInfoFromURL(url)
+		if err != nil {
+			t.Errorf("GetInfoFromURL() failed with error: %v", err)
+			t.FailNow()
+		}
 
-	if err != nil {
-		t.Errorf("GetInfoFromURL() failed with error: %v", err)
-		t.FailNow()
+		if ge.Album != nil || ge.GAlbum != nil || ge.GImage == nil || ge.Image != nil {
+			t.Error("GetInfoFromURL() failed. Returned wrong type.")
+			t.FailNow()
+		}
+
+		img := ge.GImage
+
+		if img.Title != "An abandoned Chinese fishing village" || img.Animated != false || img.Description != "" || img.Height != 445 || img.Width != 800 || img.ID != "uPI76jY" || img.Link != "https://i.imgur.com/uPI76jY.jpg" {
+			t.Fail()
+		}
+
+		if status != 200 {
+			t.Fail()
+		}
 	}
 
-	if ge.Album != nil || ge.GAlbum != nil || ge.GImage == nil || ge.Image != nil {
-		t.Error("GetInfoFromURL() failed. Returned wrong type.")
-		t.FailNow()
+	TEST_URLS := []string{
+		"https://imgur.com/gallery/uPI76jY",
+		"https://imgur.io/gallery/uPI76jY",
 	}
 
-	img := ge.GImage
-
-	if img.Title != "An abandoned Chinese fishing village" || img.Animated != false || img.Description != "" || img.Height != 445 || img.Width != 800 || img.ID != "uPI76jY" || img.Link != "https://i.imgur.com/uPI76jY.jpg" {
-		t.Fail()
-	}
-
-	if status != 200 {
-		t.Fail()
+	for _, url := range TEST_URLS {
+		checker(url)
 	}
 }
 
@@ -247,7 +311,6 @@ func TestGetURLImageSimulated(t *testing.T) {
 	client.imgurAccount.clientID = "testing"
 
 	ge, status, err := client.GetInfoFromURL("https://imgur.com/ClF8rLe")
-
 	if err != nil {
 		t.Errorf("GetInfoFromURL() failed with error: %v", err)
 		t.FailNow()
@@ -292,40 +355,50 @@ func TestGetURLImageReal(t *testing.T) {
 
 	client, _ := NewClient(new(http.Client), key, RapidAPIKey)
 
-	ge, status, err := client.GetInfoFromURL("https://imgur.com/ClF8rLe")
+	checker := func(url string) {
+		ge, status, err := client.GetInfoFromURL(url)
+		if err != nil {
+			t.Errorf("GetInfoFromURL() failed with error: %v", err)
+			t.FailNow()
+		}
 
-	if err != nil {
-		t.Errorf("GetInfoFromURL() failed with error: %v", err)
-		t.FailNow()
-	}
+		if ge.Album != nil || ge.GAlbum != nil {
+			t.Error("GetInfoFromURL() failed. Returned wrong type.")
+			t.FailNow()
+		}
 
-	if ge.Album != nil || ge.GAlbum != nil {
-		t.Error("GetInfoFromURL() failed. Returned wrong type.")
-		t.FailNow()
-	}
+		if ge.Image == nil && ge.GImage == nil {
+			t.FailNow()
+		}
 
-	if ge.Image == nil && ge.GImage == nil {
-		t.FailNow()
-	}
+		if ge.Image != nil {
+			img := ge.Image
 
-	if ge.Image != nil {
-		img := ge.Image
+			if img.Animated != false || img.Datetime != 1451248840 || img.Description != "" || img.Height != 3264 || img.Width != 2448 || img.ID != "ClF8rLe" || img.Link != "https://i.imgur.com/ClF8rLe.jpg" {
+				t.Fail()
+			}
+		}
 
-		if img.Animated != false || img.Datetime != 1451248840 || img.Description != "" || img.Height != 3264 || img.Width != 2448 || img.ID != "ClF8rLe" || img.Link != "https://i.imgur.com/ClF8rLe.jpg" {
+		if ge.GImage != nil {
+			img := ge.GImage
+
+			if img.Animated != false || img.Datetime != 1451248840 || img.Description != "" || img.Height != 3264 || img.Width != 2448 || img.ID != "ClF8rLe" || img.Link != "https://i.imgur.com/ClF8rLe.jpg" {
+				t.Fail()
+			}
+		}
+
+		if status != 200 {
 			t.Fail()
 		}
 	}
 
-	if ge.GImage != nil {
-		img := ge.GImage
-
-		if img.Animated != false || img.Datetime != 1451248840 || img.Description != "" || img.Height != 3264 || img.Width != 2448 || img.ID != "ClF8rLe" || img.Link != "https://i.imgur.com/ClF8rLe.jpg" {
-			t.Fail()
-		}
+	TEST_URLS := []string{
+		"https://imgur.com/ClF8rLe",
+		"https://imgur.io/ClF8rLe",
 	}
 
-	if status != 200 {
-		t.Fail()
+	for _, url := range TEST_URLS {
+		checker(url)
 	}
 }
 
@@ -334,11 +407,23 @@ func TestGetFromURLImageNoID(t *testing.T) {
 	defer server.Close()
 
 	client, _ := NewClient(httpC, "testing", "")
-	_, _, err := client.GetInfoFromURL("https://imgur.com/")
 
-	if err == nil {
-		t.Error("GetInfoFromURL() did not failed but should have.")
-		t.FailNow()
+	checker := func(url string) {
+		_, _, err := client.GetInfoFromURL(url)
+
+		if err == nil {
+			t.Error("GetInfoFromURL() did not failed but should have.")
+			t.FailNow()
+		}
+	}
+
+	TEST_URLS := []string{
+		"https://imgur.com/",
+		"https://imgur.io/",
+	}
+
+	for _, url := range TEST_URLS {
+		checker(url)
 	}
 }
 
@@ -348,7 +433,6 @@ func TestGetURLDirectImageSimulated(t *testing.T) {
 
 	client, _ := NewClient(httpC, "testing", "")
 	ge, status, err := client.GetInfoFromURL("https://i.imgur.com/ClF8rLe.jpg")
-
 	if err != nil {
 		t.Errorf("GetInfoFromURL() failed with error: %v", err)
 		t.FailNow()
@@ -393,40 +477,50 @@ func TestGetURLDirectImageReal(t *testing.T) {
 
 	client, _ := NewClient(new(http.Client), key, RapidAPIKey)
 
-	ge, status, err := client.GetInfoFromURL("https://i.imgur.com/ClF8rLe.jpg")
+	checker := func(url string) {
+		ge, status, err := client.GetInfoFromURL(url)
+		if err != nil {
+			t.Errorf("GetInfoFromURL() failed with error: %v", err)
+			t.FailNow()
+		}
 
-	if err != nil {
-		t.Errorf("GetInfoFromURL() failed with error: %v", err)
-		t.FailNow()
-	}
+		if ge.Album != nil || ge.GAlbum != nil {
+			t.Error("GetInfoFromURL() failed. Returned wrong type.")
+			t.FailNow()
+		}
 
-	if ge.Album != nil || ge.GAlbum != nil {
-		t.Error("GetInfoFromURL() failed. Returned wrong type.")
-		t.FailNow()
-	}
+		if ge.Image == nil && ge.GImage == nil {
+			t.FailNow()
+		}
 
-	if ge.Image == nil && ge.GImage == nil {
-		t.FailNow()
-	}
+		if ge.Image != nil {
+			img := ge.Image
 
-	if ge.Image != nil {
-		img := ge.Image
+			if img.Animated != false || img.Datetime != 1451248840 || img.Description != "" || img.Height != 3264 || img.Width != 2448 || img.ID != "ClF8rLe" || img.Link != "https://i.imgur.com/ClF8rLe.jpg" {
+				t.Fail()
+			}
+		}
 
-		if img.Animated != false || img.Datetime != 1451248840 || img.Description != "" || img.Height != 3264 || img.Width != 2448 || img.ID != "ClF8rLe" || img.Link != "https://i.imgur.com/ClF8rLe.jpg" {
+		if ge.GImage != nil {
+			img := ge.GImage
+
+			if img.Animated != false || img.Datetime != 1451248840 || img.Description != "" || img.Height != 3264 || img.Width != 2448 || img.ID != "ClF8rLe" || img.Link != "https://i.imgur.com/ClF8rLe.jpg" {
+				t.Fail()
+			}
+		}
+
+		if status != 200 {
 			t.Fail()
 		}
 	}
 
-	if ge.GImage != nil {
-		img := ge.GImage
-
-		if img.Animated != false || img.Datetime != 1451248840 || img.Description != "" || img.Height != 3264 || img.Width != 2448 || img.ID != "ClF8rLe" || img.Link != "https://i.imgur.com/ClF8rLe.jpg" {
-			t.Fail()
-		}
+	TEST_URLS := []string{
+		"https://i.imgur.com/ClF8rLe.jpg",
+		"https://i.imgur.io/ClF8rLe.jpg",
 	}
 
-	if status != 200 {
-		t.Fail()
+	for _, url := range TEST_URLS {
+		checker(url)
 	}
 }
 
@@ -435,10 +529,22 @@ func TestGetFromURLDirectImageNoID(t *testing.T) {
 	defer server.Close()
 
 	client, _ := NewClient(httpC, "testing", "")
-	_, _, err := client.GetInfoFromURL("https://i.imgur.com/")
 
-	if err == nil {
-		t.Error("GetInfoFromURL() did not failed but should have.")
-		t.FailNow()
+	checker := func(url string) {
+		_, _, err := client.GetInfoFromURL(url)
+
+		if err == nil {
+			t.Error("GetInfoFromURL() did not failed but should have.")
+			t.FailNow()
+		}
+	}
+
+	TEST_URLS := []string{
+		"https://i.imgur.com/",
+		"https://i.imgur.io/",
+	}
+
+	for _, url := range TEST_URLS {
+		checker(url)
 	}
 }
