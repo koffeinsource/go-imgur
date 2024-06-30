@@ -38,6 +38,7 @@ type ImageInfo struct {
 	Nsfw        bool       `json:"nsfw"`                 // Indicates if the image has been marked as nsfw or not. Defaults to null if information is not available.
 	Vote        string     `json:"vote"`                 // The current user's vote on the album. null if not signed in, if the user hasn't voted on it, or if not submitted to the gallery.
 	InGallery   bool       `json:"in_gallery"`           // True if the image has been submitted to the gallery, false if otherwise.
+	HasSound    bool       `json:"has_sound"`            // Indicates if the video has sound.
 	Limit       *RateLimit // Current rate limit
 }
 
