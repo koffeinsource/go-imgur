@@ -47,6 +47,7 @@ type GalleryImageInfo struct {
 	Score        int        `json:"score"`                // Imgur popularity score
 	IsAlbum      bool       `json:"is_album"`             // if it's an album or not
 	InMostViral  bool       `json:"in_most_viral"`        // Indicates if the album is in the most viral gallery or not.
+	HasSound     bool       `json:"has_sound"`            // Indicates if the video has sound.
 	Limit        *RateLimit // Current rate limit
 }
 
